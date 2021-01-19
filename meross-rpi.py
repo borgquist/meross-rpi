@@ -22,7 +22,7 @@ async def main():
     
     # Retrieve all the MSS310 devices that are registered on this account
     await manager.async_device_discovery()
-    plugs = manager.find_devices(device_type="mss310")
+    plugs = manager.find_devices()
     
     fredBike = ""
     prusa2 = ""

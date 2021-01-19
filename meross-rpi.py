@@ -24,18 +24,18 @@ async def main():
     await manager.async_device_discovery()
     plugs = manager.find_devices()
     
-    fredBike = ""
+    bike_station = ""
     prusa2 = ""
     for dev in plugs:
         print(f"- {dev.name} ({dev.type}): {dev.online_status}")
-        if(dev.name == "Fred Bike"):
-            print("found fred bike")
+        if(dev.name == "bike_station"):
+            print("found bike_station")
             fredBike = dev
         if(dev.name == "prusa 2"):
             print("found prusa2")
             prusa2 = dev
 
-    print(f"fred bike {fredBike}")
+    print(f"bike_station {bike_station}")
     print(f"prusa2 {prusa2}")
     if len(plugs) < 1:
         print("No MSS310 plugs found...")

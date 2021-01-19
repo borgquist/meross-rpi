@@ -29,11 +29,9 @@ async def main():
     for dev in plugs:
         print(f"- {dev.name} ({dev.type}): {dev.online_status}")
         if(dev.name == "bike_station"):
-            print("found bike_station")
-            fredBike = dev
-        if(dev.name == "prusa 2"):
-            print("found prusa2")
-            prusa2 = dev
+            print(f"found bike_station {bike_station}")
+            for setting in bike_station:
+                print(f"setting {setting}")
 
     print(f"bike_station {bike_station}")
     print(f"prusa2 {prusa2}")
@@ -43,10 +41,6 @@ async def main():
         # Turn it on channel 0
         # Note that channel argument is optional for MSS310 as they only have one channel
         dev = plugs[0]
-        print("dev is ")
-        print(dev)
-        print("plugs is ")
-        print(plugs)
 
         # The first time we play with a device, we must update its status
         await dev.async_update()

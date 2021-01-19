@@ -36,6 +36,10 @@ async def main():
         # Turn it on channel 0
         # Note that channel argument is optional for MSS310 as they only have one channel
         dev = plugs[0]
+        print("dev is ")
+        print(dev)
+        print("plugs is ")
+        print(plugs)
 
         # The first time we play with a device, we must update its status
         await dev.async_update()

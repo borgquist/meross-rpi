@@ -1,7 +1,7 @@
+import asyncio
 import RPi.GPIO as GPIO
 import time
 import threading
-import asyncio
 import os
 import json
 from meross_iot.http_api import MerossHttpClient
@@ -148,5 +148,10 @@ async def main():
     await http_api_client.async_logout()
     print("Shutdown complete!")
 
-
+if __name__ == '__main__':
+    # On Windows + Python 3.8, you should uncomment the following
+    # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+    loop.close()
 

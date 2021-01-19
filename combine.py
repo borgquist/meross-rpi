@@ -103,11 +103,11 @@ async def main():
                 print("time since last ", timestampNow - timeFanRoomPushed)
                 timeFanRoomPushed = timestampNow
                 if(isFanRoomOn):
-                    await roomfan.async_turn_on(channel=0)
+                    await roomfan.async_turn_off(channel=0)
                     GPIO.output(fanRoomLedPin,GPIO.LOW)
                     isFanRoomOn = False
                 else:
-                    await roomfan.async_turn_off(channel=0)
+                    await roomfan.async_turn_on(channel=0)
                     GPIO.output(fanRoomLedPin,GPIO.HIGH)
                     isFanRoomOn = True
                 
@@ -119,11 +119,11 @@ async def main():
                 print("time since last ", timestampNow - timeFanWindowPushed)
                 timeFanWindowPushed = timestampNow
                 if(isFanWindowOn):
-                    await windowfan.async_turn_on(channel=0)
+                    await windowfan.async_turn_off(channel=0)
                     GPIO.output(fanWindowLedPin,GPIO.LOW)
                     isFanWindowOn = False
                 else:
-                    await windowfan.async_turn_off(channel=0)
+                    await windowfan.async_turn_on(channel=0)
                     GPIO.output(fanWindowLedPin,GPIO.HIGH)
                     isFanWindowOn = True
                 
@@ -134,11 +134,11 @@ async def main():
                 print("time since last ", timestampNow - timeBikeFredPushed)
                 timeBikeFredPushed = timestampNow
                 if(isBikeFredOn):
-                    await fredbike.async_turn_on(channel=0)
+                    await fredbike.async_turn_off(channel=0)
                     GPIO.output(bikeLedFredPin,GPIO.LOW)
                     isBikeFredOn = False
                 else:
-                    await fredbike.async_turn_off(channel=0)
+                    await fredbike.async_turn_on(channel=0)
                     GPIO.output(bikeLedFredPin,GPIO.HIGH)
                     isBikeFredOn = True
 
@@ -149,11 +149,11 @@ async def main():
                 print("time since last ", timestampNow - timeBikeAmyPushed)
                 timeBikeAmyPushed = timestampNow
                 if(isBikeAmyOn):
-                    await amybike.async_turn_on(channel=0)
+                    await amybike.async_turn_off(channel=0)
                     GPIO.output(bikeLedAmyPin,GPIO.LOW)
                     isBikeAmyOn = False
                 else:
-                    await amybike.async_turn_off(channel=0)
+                    await amybike.async_turn_on(channel=0)
                     GPIO.output(bikeLedAmyPin,GPIO.HIGH)
                     isBikeAmyOn = True
         time.sleep(0.1)

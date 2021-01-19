@@ -66,6 +66,24 @@ async def main():
     await manager.async_device_discovery()
     plugs = manager.find_devices()
 
+    for dev in plugs:
+        print(f"- {dev.name} ({dev.type}): {dev.online_status}")
+        if(dev.name == "fredbike"):
+            fredbike = dev
+            print(f"found fredbike {fredbike}")
+        
+        if(dev.name == "amybike"):
+            amybike = dev
+            print(f"found amybike {amybike}")
+        
+        if(dev.name == "windowfan"):
+            windowfan = dev
+            print(f"found windowfan {windowfan}")
+        
+        if(dev.name == "roomfan"):
+            roomfan = dev
+            print(f"found roomfan {roomfan}")
+
     isFanRoomOn = False
     isFanWindowOn = False
     isBikeAmyOn = False

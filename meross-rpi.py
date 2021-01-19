@@ -29,8 +29,9 @@ async def main():
     for dev in plugs:
         print(f"- {dev.name} ({dev.type}): {dev.online_status}")
         if(dev.name == "bike_station"):
-            print(f"found bike_station {bike_station}")
-            for setting in bike_station:
+            bike_station = dev
+            print(f"found bike_station {dev}")
+            for setting in dev:
                 print(f"setting {setting}")
 
     print(f"bike_station {bike_station}")

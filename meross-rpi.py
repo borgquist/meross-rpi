@@ -24,24 +24,36 @@ async def main():
     await manager.async_device_discovery()
     plugs = manager.find_devices()
     
-    bike_station = ""
-    prusa2 = ""
+    
+    fredbike = ""
+    amybike = ""
+    windowfan = ""
+    roomfan = ""
     for dev in plugs:
         print(f"- {dev.name} ({dev.type}): {dev.online_status}")
-        if(dev.name == "bike_station"):
-            bike_station = dev
-            print(f"found bike_station {dev}")
-            for setting in dev:
-                print(f"setting {setting}")
-
-    print(f"bike_station {bike_station}")
-    print(f"prusa2 {prusa2}")
+        if(dev.name == "fredbike"):
+            fredbike = dev
+            print(f"found fredbike {fredbike}")
+        
+        if(dev.name == "amybike"):
+            amybike = dev
+            print(f"found amybike {amybike}")
+        
+        if(dev.name == "windowfan"):
+            windowfan = dev
+            print(f"found windowfan {windowfan}")
+        
+        if(dev.name == "roomfan"):
+            roomfan = dev
+            print(f"found roomfan {roomfan}")
+        
+            
     if len(plugs) < 1:
         print("No MSS310 plugs found...")
     else:
         # Turn it on channel 0
         # Note that channel argument is optional for MSS310 as they only have one channel
-        dev = plugs[0]
+        dev = fredbike
 
         # The first time we play with a device, we must update its status
         await dev.async_update()

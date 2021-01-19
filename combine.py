@@ -7,6 +7,7 @@ import json
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 
+print("Starting meross controller")
 configFilePath = '/home/pi/meross.json'
 with open(configFilePath, 'r') as f:
     configToBeLoaded = json.load(f)
@@ -51,9 +52,11 @@ timeBikeAmyPushed = timestampNow + 5
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
+print("GPIO setup complete")
 
 async def main():
     try:
+        print("in async def main")
         http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
         # Setup and start the device manager
         manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
@@ -73,6 +76,7 @@ async def main():
         timeBikeFredPushed = 0
         timeBikeAmyPushed = 0
         
+        print("starting while loop")
         while not exitapp: 
             if GPIO.input(fanRoomPin) == GPIO.HIGH:
                 timestampNow = time.time()

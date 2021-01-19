@@ -16,20 +16,27 @@ PASSWORD = configToBeLoaded['password']
 async def main():
     # Setup the HTTP client API from user-password
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
-    print("got the api client")
     # Setup and start the device manager
     manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
-    print("getting the manager")
     await manager.async_init()
-    print("got the manager")
-
+    
     # Retrieve all the MSS310 devices that are registered on this account
-    print("manager async discovery")
     await manager.async_device_discovery()
-    print("manager async discovery looking for type")
     plugs = manager.find_devices(device_type="mss310")
-    print("manager async discovery done")
+    
+    fredBike = ""
+    prusa2 = ""
+    for dev in plugs:
+        print(f"- {dev.name} ({dev.type}): {dev.online_status}")
+        if(dev.name == "Fred Bike"):
+            print("found fred bike")
+            fredBike = dev
+        if(dev.name == "prusa 2"):
+            print("found prusa2")
+            prusa2 = dev
 
+    print(f"fred bike {fredBike}")
+    print(f"prusa2 {prusa2}")
     if len(plugs) < 1:
         print("No MSS310 plugs found...")
     else:

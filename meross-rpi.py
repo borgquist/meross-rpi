@@ -19,6 +19,8 @@ async def main():
     print("got the api client")
     # Setup and start the device manager
     manager = MerossManager(http_client=http_api_client)
+    manager.requests_per_second_limit = 1
+    manager.burst_requests_per_second_limit = 1
     print("getting the manager")
     await manager.async_init()
     print("got the manager")

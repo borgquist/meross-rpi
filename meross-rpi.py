@@ -26,9 +26,10 @@ async def main():
     # Retrieve all the MSS310 devices that are registered on this account
     print("manager async discovery")
     await manager.async_device_discovery()
+    print("manager async discovery looking for type")
     plugs = manager.find_devices(device_type="mss310")
     print("manager async discovery done")
-    
+
     if len(plugs) < 1:
         print("No MSS310 plugs found...")
     else:

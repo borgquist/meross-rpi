@@ -102,7 +102,7 @@ async def main():
                 print("fanRoomPin button was pushed!")
                 print("time since last ", timestampNow - timeFanRoomPushed)
                 timeFanRoomPushed = timestampNow
-                if(isFanRoomOn):
+                if(not isFanRoomOn):
                     await roomfan.async_turn_on(channel=0)
                     GPIO.output(fanRoomLedPin,GPIO.LOW)
                     isFanRoomOn = False
@@ -118,7 +118,7 @@ async def main():
                 print("fanWindowPin button was pushed!")
                 print("time since last ", timestampNow - timeFanWindowPushed)
                 timeFanWindowPushed = timestampNow
-                if(isFanWindowOn):
+                if(not isFanWindowOn):
                     await windowfan.async_turn_on(channel=0)
                     GPIO.output(fanWindowLedPin,GPIO.LOW)
                     isFanWindowOn = False
@@ -133,7 +133,7 @@ async def main():
                 print("bikeFredPin button was pushed!")
                 print("time since last ", timestampNow - timeBikeFredPushed)
                 timeBikeFredPushed = timestampNow
-                if(isBikeFredOn):
+                if(not isBikeFredOn):
                     await fredbike.async_turn_on(channel=0)
                     GPIO.output(bikeLedFredPin,GPIO.LOW)
                     isBikeFredOn = False
@@ -148,7 +148,7 @@ async def main():
                 print("bikeAmyPin button was pushed!")
                 print("time since last ", timestampNow - timeBikeAmyPushed)
                 timeBikeAmyPushed = timestampNow
-                if(isBikeAmyOn):
+                if(not isBikeAmyOn):
                     await amybike.async_turn_on(channel=0)
                     GPIO.output(bikeLedAmyPin,GPIO.LOW)
                     isBikeAmyOn = False

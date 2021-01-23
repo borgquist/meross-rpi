@@ -9,7 +9,7 @@ import json
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 
-appname = 'merross-rpi'
+appname = 'merosss-rpi'
 folderPath = '/home/pi/'
 os.makedirs(folderPath + "logs/", exist_ok=True)
 logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
@@ -69,7 +69,7 @@ GPIO.setwarnings(False)
 logging.info("GPIO setup complete")
 http_api_client = ""
 manager = ""
-async def merross():
+async def merosss():
     global fredbike
     global amybike
     global windowfan
@@ -77,7 +77,7 @@ async def merross():
     global http_api_client
     global manager
 
-    logging.info("in async def merross")
+    logging.info("in async def merosss")
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
     # Setup and start the device manager
     manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
@@ -118,7 +118,7 @@ def haveInternet():
 async def main():
     
     logging.info("in async def main")
-    await merross()
+    await merosss()
 
     isFanRoomOn = False
     isFanWindowOn = False
@@ -148,8 +148,8 @@ async def main():
 
         if(internetWasLost):
             logging.info(
-                "internet is back, resetting the merross")
-            await merross()
+                "internet is back, resetting the merosss")
+            await merosss()
 
         if GPIO.input(fanRoomPin) == GPIO.HIGH:
             if timeFanRoomPushed < timestampNow - 1:

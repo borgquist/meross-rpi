@@ -1,13 +1,27 @@
 import asyncio
 import RPi.GPIO as GPIO
+import logging
 import time
 import threading
+import subprocess
 import os
 import json
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 
-print("Starting meross controller")
+folderPath = '/home/pi/'
+os.makedirs(folderPath + "logs/", exist_ok=True)
+logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+                    datefmt='%Y-%m-%d:%H:%M:%S',
+                    level=logging.INFO,
+                    handlers=[
+                        logging.FileHandler(
+                            folderPath + "logs/meross-rpi.log"),
+                        logging.StreamHandler()
+                    ])
+logging.info("Starting meross-rpi.py")
+
+logging.info("Starting meross controller")
 configFilePath = '/home/pi/meross.json'
 with open(configFilePath, 'r') as f:
     configToBeLoaded = json.load(f)
@@ -52,11 +66,10 @@ timeBikeAmyPushed = timestampNow + 5
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-print("GPIO setup complete")
+logging.info("GPIO setup complete")
 
-async def main():
-    
-    print("in async def main")
+async def setupManager():
+    logging.info("setupManager called")
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
     # Setup and start the device manager
     manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
@@ -67,22 +80,37 @@ async def main():
     plugs = manager.find_devices()
 
     for dev in plugs:
-        print(f"- {dev.name} ({dev.type}): {dev.online_status}")
+        logging.info(f"- {dev.name} ({dev.type}): {dev.online_status}")
         if(dev.name == "fredbike"):
             fredbike = dev
-            print(f"found fredbike {fredbike}")
+            logging.info(f"found fredbike {fredbike}")
         
         if(dev.name == "amybike"):
             amybike = dev
-            print(f"found amybike {amybike}")
+            logging.info(f"found amybike {amybike}")
         
         if(dev.name == "windowfan"):
             windowfan = dev
-            print(f"found windowfan {windowfan}")
+            logging.info(f"found windowfan {windowfan}")
         
         if(dev.name == "roomfan"):
             roomfan = dev
-            print(f"found roomfan {roomfan}")
+            logging.info(f"found roomfan {roomfan}")
+
+googleHostForInternetCheck = "8.8.8.8"
+def haveInternet():
+    try:
+        output = subprocess.check_output(
+            "ping -c 1 {}".format(googleHostForInternetCheck), shell=True)
+
+    except Exception:
+        return False
+
+    return True
+
+async def main():
+    
+    setupManager()
 
     isFanRoomOn = False
     isFanWindowOn = False
@@ -94,13 +122,26 @@ async def main():
     timeBikeFredPushed = 0
     timeBikeAmyPushed = 0
     
-    print("starting while loop")
+    logging.info("starting while loop")
     while not exitapp: 
+
+        internetWasLost = False
+        while(not haveInternet()):
+            internetWasLost = True
+            logging.info("internet is not available, sleeping 1 second")
+            time.sleep(1)
+
+        if(internetWasLost):
+            logging.info(
+                "internet is back, resetting the stream to firebase")
+            setupManager()
+
+
         if GPIO.input(fanRoomPin) == GPIO.HIGH:
             timestampNow = time.time()
             if timeFanRoomPushed < timestampNow - 1:
-                print("fanRoomPin button was pushed!")
-                print("time since last ", timestampNow - timeFanRoomPushed)
+                logging.info("fanRoomPin button was pushed!")
+                logging.info("time since last ", timestampNow - timeFanRoomPushed)
                 timeFanRoomPushed = timestampNow
                 if(isFanRoomOn):
                     await roomfan.async_turn_off(channel=0)
@@ -115,8 +156,8 @@ async def main():
         if GPIO.input(fanWindowPin) == GPIO.HIGH:
             timestampNow = time.time()
             if timeFanWindowPushed < timestampNow - 1:
-                print("fanWindowPin button was pushed!")
-                print("time since last ", timestampNow - timeFanWindowPushed)
+                logging.info("fanWindowPin button was pushed!")
+                logging.info("time since last ", timestampNow - timeFanWindowPushed)
                 timeFanWindowPushed = timestampNow
                 if(isFanWindowOn):
                     await windowfan.async_turn_off(channel=0)
@@ -130,8 +171,8 @@ async def main():
         if GPIO.input(bikeFredPin) == GPIO.HIGH:
             timestampNow = time.time()
             if timeBikeFredPushed < timestampNow - 1:
-                print("bikeFredPin button was pushed!")
-                print("time since last ", timestampNow - timeBikeFredPushed)
+                logging.info("bikeFredPin button was pushed!")
+                logging.info("time since last ", timestampNow - timeBikeFredPushed)
                 timeBikeFredPushed = timestampNow
                 if(isBikeFredOn):
                     await fredbike.async_turn_off(channel=0)
@@ -145,8 +186,8 @@ async def main():
         if GPIO.input(bikeAmyPin) == GPIO.HIGH:
             timestampNow = time.time()
             if timeBikeAmyPushed < timestampNow - 1:
-                print("bikeAmyPin button was pushed!")
-                print("time since last ", timestampNow - timeBikeAmyPushed)
+                logging.info("bikeAmyPin button was pushed!")
+                logging.info("time since last ", timestampNow - timeBikeAmyPushed)
                 timeBikeAmyPushed = timestampNow
                 if(isBikeAmyOn):
                     await amybike.async_turn_off(channel=0)
@@ -158,13 +199,13 @@ async def main():
                     isBikeAmyOn = True
         time.sleep(0.1)
 
-    print("Shutting down!")
+    logging.info("Shutting down!")
     manager.close()
     await http_api_client.async_logout()
     GPIO.cleanup()
     manager.close()
     await http_api_client.async_logout()
-    print("Shutdown complete!")
+    logging.info("Shutdown complete!")
 
 if __name__ == '__main__':
     # On Windows + Python 3.8, you should uncomment the following

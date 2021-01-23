@@ -105,6 +105,7 @@ async def merross():
             roomfan = dev
             logging.info(f"found roomfan {roomfan}")
 
+googleHostForInternetCheck = "8.8.8.8"
 def haveInternet():
     try:
         output = subprocess.check_output(

@@ -118,7 +118,7 @@ def haveInternet():
 async def main():
     
     logging.info("in async def main")
-    merross()
+    await merross()
 
     isFanRoomOn = False
     isFanWindowOn = False
@@ -149,7 +149,7 @@ async def main():
         if(internetWasLost):
             logging.info(
                 "internet is back, resetting the merross")
-            merross()
+            await merross()
 
         if GPIO.input(fanRoomPin) == GPIO.HIGH:
             if timeFanRoomPushed < timestampNow - 1:

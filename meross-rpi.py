@@ -110,7 +110,7 @@ def haveInternet():
 
 async def main():
     
-    setupManager()
+    await setupManager()
 
     isFanRoomOn = False
     isFanWindowOn = False
@@ -134,7 +134,7 @@ async def main():
         if(internetWasLost):
             logging.info(
                 "internet is back, resetting the stream to firebase")
-            setupManager()
+            await setupManager()
 
 
         if GPIO.input(fanRoomPin) == GPIO.HIGH:

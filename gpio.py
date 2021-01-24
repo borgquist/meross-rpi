@@ -40,7 +40,9 @@ class GpioManager:
             self.buttonPin = bPin
             self.ledPin = lPin
             self.name = n
-        
+        def __str__(self):
+            return "name [" + str(self.name) + "] buttonPin [" + str(self.buttonPin) + "] ledPin [" + str(self.ledPin) + "]"
+
 
     bikeFred = Button(bikeFredPin, bikeLedFredPin, "bikeFred")
     bikeAmy = Button(bikeAmyPin, bikeLedAmyPin, "bikeAmy")

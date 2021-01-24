@@ -160,7 +160,7 @@ async def main():
         if GPIO.input(fanRoomPin) == GPIO.HIGH:
             if timeFanRoomPushed < timestampNow - 1:
                 logging.info("fanRoomPin button was pushed!")
-                logging.info("time since last " + str (timestampNow - timeFanWindowPushed))
+                logging.info("time since last ", timestampNow - timeFanRoomPushed)
                 timeFanRoomPushed = timestampNow
                 if(isFanRoomOn):
                     await roomfan.async_turn_off(channel=0)
@@ -175,7 +175,7 @@ async def main():
         if GPIO.input(fanWindowPin) == GPIO.HIGH:
             if timeFanWindowPushed < timestampNow - 1:
                 logging.info("fanWindowPin button was pushed!")
-                logging.info("time since last " + str (timestampNow - timeFanWindowPushed))
+                logging.info("time since last ", timestampNow - timeFanWindowPushed)
                 timeFanWindowPushed = timestampNow
                 if(isFanWindowOn):
                     await windowfan.async_turn_off(channel=0)
@@ -189,7 +189,7 @@ async def main():
         if GPIO.input(bikeFredPin) == GPIO.HIGH:
             if timeBikeFredPushed < timestampNow - 1:
                 logging.info("bikeFredPin button was pushed!")
-                logging.info("time since last " + str (timestampNow - timeFanWindowPushed))
+                logging.info("time since last ", timestampNow - timeBikeFredPushed)
                 timeBikeFredPushed = timestampNow
                 if(isBikeFredOn):
                     await fredbike.async_turn_off(channel=0)
@@ -203,7 +203,7 @@ async def main():
         if GPIO.input(bikeAmyPin) == GPIO.HIGH:
             if timeBikeAmyPushed < timestampNow - 1:
                 logging.info("bikeAmyPin button was pushed!")
-                logging.info("time since last " + str (timestampNow - timeFanWindowPushed))
+                logging.info("time since last ", timestampNow - timeBikeAmyPushed)
                 timeBikeAmyPushed = timestampNow
                 if(isBikeAmyOn):
                     await amybike.async_turn_off(channel=0)

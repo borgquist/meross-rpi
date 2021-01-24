@@ -48,6 +48,7 @@ class GpioManager:
     fanWindow = Button(fanWindowPin, fanWindowLedPin, "fanWindow")
 
     def getButton(self, buttonName):
+        print("comparing " + buttonName)
         if(buttonName == "fredBike"):
             return self.bikeFred
         if(buttonName == "amyBike"):

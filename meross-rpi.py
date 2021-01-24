@@ -230,8 +230,9 @@ if __name__ == '__main__':
     logger.info("in async def main")
 
     loop = asyncio.get_event_loop()
-    taskObj = loop.create_task(checkInternet())
-    loop.run_until_complete(main(), taskObj)
-    loop.close()
+    loop.create_task(checkInternet())
+    loop.create_task(main())
+    loop.run_forever()
+    
     logger.info("loop closed")
 

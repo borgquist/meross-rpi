@@ -92,6 +92,7 @@ def thread_internet(name):
     
     while not exitapp:
         try:
+            time.sleep(1)
             logger.info("checking internet")
             internetWasLost = False
             while(not haveInternet()):
@@ -104,7 +105,6 @@ def thread_internet(name):
                 logger.info(
                     "internet is back, resetting the stream to firebase")
                 doReset = True
-            time.sleep(1)
 
         except Exception as err:
             logger.error("exception " + traceback.format_exc())

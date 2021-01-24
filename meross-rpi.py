@@ -75,16 +75,17 @@ async def checkInternet():
     logger = logging.getLogger('merosslogger')
     global doReset
     logger.info("checking internet")
-    internetWasLost = False
+    internetIsLost = False
     while(True):
         while(not haveInternet()):
-            internetWasLost = True
+            internetIsLost = True
             logger.info("internet is not available, sleeping 1 second")
             await asyncio.sleep(1)
         
-        if(internetWasLost):
-            logger.info("internet is back, setting doReset to True")
-            doReset = True
+        if internetIsLost:
+            logger.info("internet is back")
+            internetIsLost = False
+            
         await asyncio.sleep(3)
 
     
@@ -120,11 +121,11 @@ async def main():
     while not exitapp: 
         try:
             
-            if(doReset):
-                logger.info("calling getplugs to do a reaset")
-                doReset = False
-                await shutdownPlugs(manager, http_api_client)
-                await getPlugs(manager)
+            # if(doReset):
+            #     logger.info("calling getplugs to do a reaset")
+            #     doReset = False
+            #     await shutdownPlugs(manager, http_api_client)
+            #     await getPlugs(manager)
 
             timestampNow = time.time()
 

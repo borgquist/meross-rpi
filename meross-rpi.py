@@ -65,7 +65,7 @@ async def main():
     global devBikeAmy 
     global devFanWindow
     global devFanRoom 
-    
+
     logger = logging.getLogger('merosslogger')
     exitapp = False
     gpioManager = GpioManager("test")
@@ -76,7 +76,7 @@ async def main():
     else:
         logger.info("internet is NOT available")
 
-    getPlugs()
+    await getPlugs()
 
     isFanRoomOn = False
     isFanWindowOn = False

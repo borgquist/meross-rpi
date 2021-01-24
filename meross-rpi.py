@@ -167,11 +167,11 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
     if exists(log_file):
         remove(log_file)
     # Configure log file
-    l = logger.getLogger(logger_name)
-    formatter = logger.Formatter('%(message)s')
-    fileHandler = logger.FileHandler(log_file, mode='w')
+    l = logging.getLogger(logger_name)
+    formatter = logging.Formatter('%(message)s')
+    fileHandler = logging.FileHandler(log_file, mode='w')
     fileHandler.setFormatter(formatter)
-    streamHandler = logger.StreamHandler()
+    streamHandler = logging.StreamHandler()
     streamHandler.setFormatter(formatter)
     l.setLevel(level)
     l.addHandler(fileHandler)

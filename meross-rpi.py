@@ -13,7 +13,8 @@ from os.path import exists
 import traceback
 import threading
 
-async def haveInternet():
+
+def haveInternet():
     googleHostForInternetCheck = "8.8.8.8"
     try:
         output = subprocess.check_output(
@@ -24,31 +25,8 @@ async def haveInternet():
 
     return True
 
-# Check internet connectivity by sending DNS lookup to Google's 8.8.8.8
-async def wan_ok(self, packet = b'$\x1a\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x03www\x06google\x03com\x00\x00\x01\x00\x01'):
-    logger = logging.getLogger('merosslogger')
-    if not self.isconnected():  # WiFi is down
-        logger.info("wanOk was False isconnected")
-        return False
-    length = 32  # DNS query and response packet size
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.setblocking(False)
-    s.connect(('8.8.8.8', 53))
-    await asyncio.sleep(1)
-    try:
-        await self._as_write(packet, sock = s)
-        await asyncio.sleep(2)
-        res = await self._as_read(length, s)
-        if len(res) == length:
-            logger.info("wanOk was True res length")
-            return True  # DNS response size OK
-    except OSError:  # Timeout on read: no connectivity.
-        logger.info("wanOk was False os error")
-        return False
-    finally:
-        s.close()
-    logger.info("wanOk was False")
-    return False
+
+
 
 devBikeFred = "notSet"
 devBikeAmy = "notSet"
@@ -105,8 +83,7 @@ def thread_internet(name):
                 internetWasLost = True
                 logger.info("internet is not available, sleeping 1 second")
                 time.sleep(1)
-            wanOk = wan_ok('$\x1a\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x03www\x06google\x03com\x00\x00\x01\x00\x01')
-            logger.info("wanOk was [" + str(wanOk) + "]")
+            
             if(internetWasLost):
                 logger.info(
                     "internet is back, resetting the stream to firebase")
@@ -117,6 +94,7 @@ def thread_internet(name):
 
     logger.info("thread_time    : exiting")
 
+
 async def main():
     global devBikeFred 
     global devBikeAmy 
@@ -126,12 +104,6 @@ async def main():
     logger = logging.getLogger('merosslogger')
     
     gpioManager = GpioManager("test")
-
-    internetAvailable = await haveInternet()
-    if(internetAvailable):
-        logger.info("internet is available")
-    else:
-        logger.info("internet is NOT available")
 
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
     # Setup and start the device manager

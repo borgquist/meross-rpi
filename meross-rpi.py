@@ -133,7 +133,8 @@ async def main():
                 await devBikeAmy.async_update()
                 await devFanWindow.async_update()
                 await devFanRoom.async_update()
-                logger.info("done doing async update")
+                logger.info("done doing async update, sleeping 3 seconds to prevent races")
+                asyncio.sleep(3)
 
                 
 

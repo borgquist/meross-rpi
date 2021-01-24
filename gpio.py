@@ -61,6 +61,7 @@ class GpioManager:
 
     def isButtonPushed(self, buttonName):
         button = self.getButton(buttonName)
+        print(button)
         if GPIO.input(button.buttonPin) == GPIO.HIGH:
             logging.info(button.name  + " button was pushed!")
             return True

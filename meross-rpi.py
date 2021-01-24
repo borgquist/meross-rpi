@@ -2,6 +2,7 @@ import asyncio
 import RPi.GPIO as GPIO
 import time
 import logging
+import socket
 import subprocess
 import json
 from meross_iot.http_api import MerossHttpClient
@@ -22,6 +23,27 @@ async def haveInternet():
         return False
 
     return True
+
+# Check internet connectivity by sending DNS lookup to Google's 8.8.8.8
+async def wan_ok(self, packet = b'$\x1a\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x03www\x06google\x03com\x00\x00\x01\x00\x01'):
+    if not self.isconnected():  # WiFi is down
+        return False
+    length = 32  # DNS query and response packet size
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.setblocking(False)
+    s.connect(('8.8.8.8', 53))
+    await asyncio.sleep(1)
+    try:
+        await self._as_write(packet, sock = s)
+        await asyncio.sleep(2)
+        res = await self._as_read(length, s)
+        if len(res) == length:
+            return True  # DNS response size OK
+    except OSError:  # Timeout on read: no connectivity.
+        return False
+    finally:
+        s.close()
+    return False
 
 devBikeFred = "notSet"
 devBikeAmy = "notSet"
@@ -76,7 +98,8 @@ def thread_internet(name):
                 internetWasLost = True
                 logger.info("internet is not available, sleeping 1 second")
                 time.sleep(1)
-
+            wanOk = wan_ok()
+            print("wanOk was [" + wanOk + "]")
             if(internetWasLost):
                 logger.info(
                     "internet is back, resetting the stream to firebase")

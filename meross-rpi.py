@@ -14,6 +14,19 @@ import traceback
 import threading
 
 
+def haveInternet():
+    googleHostForInternetCheck = "8.8.8.8"
+    try:
+        output = subprocess.check_output(
+            "ping -c 1 {}".format(googleHostForInternetCheck), shell=True)
+
+    except Exception:
+        return False
+
+    return True
+
+
+
 
 devBikeFred = "notSet"
 devBikeAmy = "notSet"
@@ -21,20 +34,15 @@ devFanWindow = "notSet"
 devFanRoom = "notSet"
 exitapp = False
 
-
-async def main():
+async def getPlugs(manager):
     global devBikeFred 
     global devBikeAmy 
     global devFanWindow
     global devFanRoom 
+    global doReset
+    await manager.async_init()
     logger = logging.getLogger('merosslogger')
     
-    gpioManager = GpioManager("test")
-
-    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
-    # Setup and start the device manager
-    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
-    await manager.async_init()
     # Retrieve all the MSS310 devices that are registered on this account
     await manager.async_device_discovery()
     plugs = manager.find_devices()
@@ -56,7 +64,52 @@ async def main():
         if(dev.name == "roomfan"):
             devFanRoom = dev
             logger.info(f"found devFanRoom {devFanRoom}")
+    doReset = False
+
+async def shutdownPlugs(manager, http_api_client):
+    manager.close()
+    await http_api_client.async_logout()
+
+doReset = False
+def thread_internet(name):
+    logger = logging.getLogger('merosslogger')
     
+    while not exitapp:
+        try:
+            time.sleep(1)
+            logger.info("checking internet")
+            internetWasLost = False
+            while(not haveInternet()):
+                internetWasLost = True
+                logger.info("internet is not available, sleeping 1 second")
+                time.sleep(1)
+            
+            if(internetWasLost):
+                logger.info(
+                    "internet is back, resetting the stream to firebase")
+                doReset = True
+
+        except Exception as err:
+            logger.error("exception " + traceback.format_exc())
+
+    logger.info("thread_time    : exiting")
+
+
+async def main():
+    global devBikeFred 
+    global devBikeAmy 
+    global devFanWindow
+    global devFanRoom 
+    global doReset
+    logger = logging.getLogger('merosslogger')
+    
+    gpioManager = GpioManager("test")
+
+    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
+    # Setup and start the device manager
+    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
+    
+    await getPlugs(manager)
 
     isFanRoomOn = False
     isFanWindowOn = False
@@ -67,14 +120,21 @@ async def main():
     timeFanWindowPushed = 0
     timeBikeFredPushed = 0
     timeBikeAmyPushed = 0
-    
+    timestampInternetCheck = 0
+
     logger.info("starting while loop")
     while not exitapp: 
         try:
+            if(doReset):
+                logger.info("calling getplugs to do a reaset")
+                await getPlugs(manager)
+                doReset = False
+
             timestampNow = time.time()
 
             buttonName = "fanRoom"
             if gpioManager.isButtonPushed("fanRoom"):
+                logger.info("trace 2")
                 if timeFanRoomPushed < timestampNow - 1:
                     logger.info(buttonName + " button was pushed!")
                     timeFanRoomPushed = timestampNow
@@ -130,14 +190,13 @@ async def main():
                         gpioManager.setLed("bikeAmy", True)
                         isBikeAmyOn = True
             
-            await asyncio.sleep(0.2)
+            asyncio.sleep(0.2)
             
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
 
     logger.info("Shutting down!")
-    manager.close()
-    await http_api_client.async_logout()
+    await shutdownPlugs(manager, http_api_client)
     logger.info("Plugs shut down")
     GPIO.cleanup()
     logger.info("Shutdown complete!")
@@ -177,6 +236,8 @@ if __name__ == '__main__':
     logger.info("Starting " + appname)
     logger.info("in async def main")
     
+    internetThread = threading.Thread(target=thread_internet, args=(1,))
+    internetThread.start()
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())

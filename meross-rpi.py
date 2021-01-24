@@ -12,14 +12,7 @@ from gpio import GpioManager
 
 appname = 'merross'
 folderPath = '/home/pi/'
-logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
-                    datefmt='%Y-%m-%d:%H:%M:%S',
-                    level=logging.INFO,
-                    handlers=[
-                        logging.FileHandler(
-                            folderPath +appname+".log"),
-                        logging.StreamHandler()
-                    ])
+logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.INFO)
 logging.info("Starting " + appname)
 
 configFilePath = '/home/pi/meross.json'

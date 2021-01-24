@@ -9,7 +9,8 @@ from meross_iot.manager import MerossManager
 from gpio import GpioManager
 from os import remove
 from os.path import exists
-
+import traceback
+import threading
 
 async def haveInternet():
     googleHostForInternetCheck = "8.8.8.8"
@@ -26,16 +27,14 @@ devBikeFred = "notSet"
 devBikeAmy = "notSet"
 devFanWindow = "notSet"
 devFanRoom = "notSet"
+exitapp = False
 
-async def getPlugs():
+async def getPlugs(manager):
     global devBikeFred 
     global devBikeAmy 
     global devFanWindow
     global devFanRoom 
 
-    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
-    # Setup and start the device manager
-    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
     await manager.async_init()
 
     # Retrieve all the MSS310 devices that are registered on this account
@@ -59,6 +58,36 @@ async def getPlugs():
         if(dev.name == "roomfan"):
             devFanRoom = dev
             logger.info(f"found devFanRoom {devFanRoom}")
+            
+async def shutdownPlugs(manager, http_api_client):
+    manager.close()
+    await http_api_client.async_logout()
+
+doReset = False
+def thread_internet(name):
+    logger = logging.getLogger('merosslogger')
+    
+    while not exitapp:
+        try:
+            timestampNow = time.time()
+            
+            time.sleep(5)
+
+            internetWasLost = False
+            while(not haveInternet()):
+                internetWasLost = True
+                logger.info("internet is not available, sleeping 1 second")
+                time.sleep(1)
+
+            if(internetWasLost):
+                logger.info(
+                    "internet is back, resetting the stream to firebase")
+                doReset = True
+
+        except Exception as err:
+            logger.error("exception " + traceback.format_exc())
+
+    logger.info("thread_time    : exiting")
 
 async def main():
     global devBikeFred 
@@ -67,7 +96,7 @@ async def main():
     global devFanRoom 
 
     logger = logging.getLogger('merosslogger')
-    exitapp = False
+    
     gpioManager = GpioManager("test")
 
     internetAvailable = await haveInternet()
@@ -76,7 +105,11 @@ async def main():
     else:
         logger.info("internet is NOT available")
 
-    await getPlugs()
+    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
+    # Setup and start the device manager
+    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
+    
+    await getPlugs(manager)
 
     isFanRoomOn = False
     isFanWindowOn = False
@@ -93,25 +126,6 @@ async def main():
     while not exitapp: 
 
         timestampNow = time.time()
-
-        
-        internetWasLost = False
-        if(timestampNow - timestampInternetCheck > 5):
-            logger.info("checking internet")
-            while(not haveInternet()):
-                internetWasLost = True
-                logger.info("internet is not available, sleeping 1 second")
-                time.sleep(1)
-            timestampInternetCheck = timestampNow
-
-        if(internetWasLost):
-            logger.info(
-                "internet is back, resetting the merross")
-            manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
-            await manager.async_init()
-            logger.info(
-                "reset done of the merross")
-            
 
         buttonName = "fanRoom"
         if gpioManager.isButtonPushed("fanRoom") and devFanRoom is not "notSet":
@@ -172,8 +186,8 @@ async def main():
         time.sleep(0.2)
 
     logger.info("Shutting down!")
-    manager.close()
-    await http_api_client.async_logout()
+    await shutdownPlugs(manager, http_api_client)
+    logger.info("Plugs shut down")
     GPIO.cleanup()
     logger.info("Shutdown complete!")
 
@@ -208,10 +222,13 @@ if __name__ == '__main__':
     logger = logging.getLogger('merosslogger')
     
 
+
     logger.info("Starting " + appname)
     logger.info("in async def main")
-    # On Windows + Python 3.8, you should uncomment the following
-    # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    
+    internetThread = threading.Thread(target=thread_internet, args=(1,))
+    internetThread.start()
+
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
     loop.close()

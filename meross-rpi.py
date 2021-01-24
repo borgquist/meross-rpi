@@ -90,7 +90,6 @@ async def main():
             
             # first time is created and then afterwards this is a reset
             if(doReset and not internetIsLost):
-                logger.info("calling getplugs to do a reaset")
                 doReset = False
                 logger.info("recreating http client")
                 http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)

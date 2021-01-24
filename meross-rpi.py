@@ -69,7 +69,6 @@ GPIO.setwarnings(False)
 logging.info("GPIO setup complete")
 http_api_client = ""
 manager = ""
-haveThePlugs = False
 async def merosss():
     global fredbike
     global amybike
@@ -77,7 +76,6 @@ async def merosss():
     global roomfan
     global http_api_client
     global manager
-    global haveThePlugs
 
     logging.info("in async def merosss")
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
@@ -89,26 +87,23 @@ async def merosss():
     await manager.async_device_discovery()
     plugs = manager.find_devices()
 
-    
-    if(not haveThePlugs):
-        for dev in plugs:
-            logging.info(f"- {dev.name} ({dev.type}): {dev.online_status}")
-            if(dev.name == "fredbike"):
-                fredbike = dev
-                logging.info(f"found fredbike {fredbike}")
-            
-            if(dev.name == "amybike"):
-                amybike = dev
-                logging.info(f"found amybike {amybike}")
-            
-            if(dev.name == "windowfan"):
-                windowfan = dev
-                logging.info(f"found windowfan {windowfan}")
-            
-            if(dev.name == "roomfan"):
-                roomfan = dev
-                logging.info(f"found roomfan {roomfan}")
-        haveThePlugs = True
+    for dev in plugs:
+        logging.info(f"- {dev.name} ({dev.type}): {dev.online_status}")
+        if(dev.name == "fredbike"):
+            fredbike = dev
+            logging.info(f"found fredbike {fredbike}")
+        
+        if(dev.name == "amybike"):
+            amybike = dev
+            logging.info(f"found amybike {amybike}")
+        
+        if(dev.name == "windowfan"):
+            windowfan = dev
+            logging.info(f"found windowfan {windowfan}")
+        
+        if(dev.name == "roomfan"):
+            roomfan = dev
+            logging.info(f"found roomfan {roomfan}")
 
 googleHostForInternetCheck = "8.8.8.8"
 def haveInternet():

@@ -71,11 +71,12 @@ async def shutdownPlugs(manager, http_api_client):
     await http_api_client.async_logout()
 
 doReset = False
+internetIsLost = False
 async def checkInternet():
     logger = logging.getLogger('merosslogger')
     global doReset
+    global internetIsLost
     logger.info("checking internet")
-    internetIsLost = False
     while(True):
         while(not haveInternet()):
             internetIsLost = True
@@ -84,6 +85,7 @@ async def checkInternet():
         
         if internetIsLost:
             logger.info("internet is back")
+            doReset = True
             internetIsLost = False
             
         await asyncio.sleep(3)
@@ -121,11 +123,17 @@ async def main():
     while not exitapp: 
         try:
             
-            # if(doReset):
-            #     logger.info("calling getplugs to do a reaset")
-            #     doReset = False
-            #     await shutdownPlugs(manager, http_api_client)
-            #     await getPlugs(manager)
+            if(doReset):
+                logger.info("calling getplugs to do a reaset")
+                doReset = False
+                logger.info("doing async update")
+                devBikeFred.async_update()
+                devBikeAmy.async_update()
+                devFanWindow.async_update()
+                devFanRoom.async_update()
+                logger.info("done doing async update")
+                
+                
 
             timestampNow = time.time()
 

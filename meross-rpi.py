@@ -9,7 +9,7 @@ import json
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 
-appname = 'merosssrpi'
+appname = 'merosss-rpi'
 folderPath = '/home/pi/'
 os.makedirs(folderPath + "logs/", exist_ok=True)
 logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',

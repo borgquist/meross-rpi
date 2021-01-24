@@ -26,6 +26,7 @@ async def haveInternet():
 
 # Check internet connectivity by sending DNS lookup to Google's 8.8.8.8
 async def wan_ok(self, packet = b'$\x1a\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x03www\x06google\x03com\x00\x00\x01\x00\x01'):
+    logger = logging.getLogger('merosslogger')
     if not self.isconnected():  # WiFi is down
         logger.info("wanOk was False isconnected")
         return False
@@ -62,7 +63,8 @@ async def getPlugs(manager):
     global devFanRoom 
     global doReset
     await manager.async_init()
-
+    logger = logging.getLogger('merosslogger')
+    
     # Retrieve all the MSS310 devices that are registered on this account
     await manager.async_device_discovery()
     plugs = manager.find_devices()

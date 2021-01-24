@@ -8,8 +8,6 @@ import subprocess
 import json
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
-from aiologger import Logger
-from logging import getLogger
 
 appname = 'merosssrpi'
 folderPath = '/home/pi/'
@@ -147,6 +145,7 @@ async def main():
         internetWasLost = False
         if(timestampNow - timestampInternetCheck > 5):
             logging.info("checking internet")
+            await merosss()
             while(not haveInternet()):
                 internetWasLost = True
                 logging.info("internet is not available, sleeping 1 second")

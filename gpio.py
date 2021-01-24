@@ -74,6 +74,6 @@ class GpioManager:
         if(setOn):
             GPIO.output(button.ledPin, GPIO.HIGH)
         else:
-            GPIO.output(button.ledPin, GPIO.HIGH)
+            GPIO.output(button.ledPin, GPIO.LOW)
                     
             

@@ -10,15 +10,14 @@ from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 from gpio import GpioManager
 
-appname = 'merross-rpi'
+appname = 'merross'
 folderPath = '/home/pi/'
-os.makedirs(folderPath + "logs/", exist_ok=True)
 logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
                     datefmt='%Y-%m-%d:%H:%M:%S',
                     level=logging.INFO,
                     handlers=[
                         logging.FileHandler(
-                            folderPath + "logs/"+appname+".log"),
+                            folderPath +appname+".log"),
                         logging.StreamHandler()
                     ])
 logging.info("Starting " + appname)

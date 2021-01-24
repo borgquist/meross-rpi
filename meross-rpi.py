@@ -122,8 +122,9 @@ async def main():
             
             if(doReset):
                 logger.info("calling getplugs to do a reaset")
-                await getPlugs(manager)
                 doReset = False
+                await shutdownPlugs(manager, http_api_client)
+                await getPlugs(manager)
 
             timestampNow = time.time()
 

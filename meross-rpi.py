@@ -168,7 +168,7 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
         remove(log_file)
     # Configure log file
     l = logging.getLogger(logger_name)
-    formatter = logging.Formatter('%(message)s')
+    formatter = logging.Formatter('%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
     fileHandler = logging.FileHandler(log_file, mode='w')
     fileHandler.setFormatter(formatter)
     streamHandler = logging.StreamHandler()

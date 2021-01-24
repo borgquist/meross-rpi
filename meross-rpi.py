@@ -36,10 +36,6 @@ exitapp = False
 
     
 
-async def shutdownPlugs(manager, http_api_client):
-    manager.close()
-    await http_api_client.async_logout()
-
 doReset = False
 internetIsLost = False
 async def checkInternet():
@@ -69,6 +65,7 @@ async def main():
     global devFanWindow
     global devFanRoom 
     global doReset
+    global internetIsLost
     logger = logging.getLogger('merosslogger')
     
     gpioManager = GpioManager("test")
@@ -89,6 +86,8 @@ async def main():
     logger.info("starting while loop")
     while not exitapp: 
         try:
+            await asyncio.sleep(0.2)
+            
             # first time is created and then afterwards this is a reset
             if(doReset):
                 logger.info("calling getplugs to do a reaset")
@@ -127,15 +126,17 @@ async def main():
                 await devFanWindow.async_update()
                 await devFanRoom.async_update()
                 logger.info("done doing async update, sleeping 3 seconds to prevent races")
-                asyncio.sleep(3)
+                await asyncio.sleep(3)
 
                 
-
+            
             timestampNow = time.time()
 
             buttonName = "fanRoom"
             if gpioManager.isButtonPushed("fanRoom"):
-                if timeFanRoomPushed < timestampNow - 1:
+                if(internetIsLost):
+                    logger.info("not processing " + buttonName + " button press since internet is lost")
+                elif timeFanRoomPushed < timestampNow - 1:
                     logger.info(buttonName + " button was pushed!")
                     timeFanRoomPushed = timestampNow
                     if(isFanRoomOn):
@@ -150,7 +151,9 @@ async def main():
 
             buttonName = "fanWindow"
             if gpioManager.isButtonPushed("fanWindow"):
-                if timeFanWindowPushed < timestampNow - 1:
+                if(internetIsLost):
+                    logger.info("not processing " + buttonName + " button press since internet is lost")
+                elif timeFanWindowPushed < timestampNow - 1:
                     logger.info(buttonName + " button was pushed!")
                     timeFanWindowPushed = timestampNow
                     if(isFanWindowOn):
@@ -163,8 +166,10 @@ async def main():
                         isFanWindowOn = True
                     
             buttonName = "bikeFred"
-            if gpioManager.isButtonPushed("bikeFred"):
-                if timeBikeFredPushed < timestampNow - 1:
+            if gpioManager.isButtonPushed(buttonName):
+                if(internetIsLost):
+                    logger.info("not processing " + buttonName + " button press since internet is lost")
+                elif timeBikeFredPushed < timestampNow - 1:
                     logger.info(buttonName + " button was pushed!")
                     timeBikeFredPushed = timestampNow
                     if(isBikeFredOn):
@@ -177,25 +182,30 @@ async def main():
                         isBikeFredOn = True
 
             
-            if gpioManager.isButtonPushed("bikeAmy"):
-                if timeBikeAmyPushed < timestampNow - 1:
-                    logger.info("bikeAmy" + " button was pushed!")
+            buttonName = "bikeAmy"
+            if gpioManager.isButtonPushed(buttonName):
+                if(internetIsLost):
+                    logger.info("not processing " + buttonName + " button press since internet is lost")
+                elif timeBikeAmyPushed < timestampNow - 1:
+                    logger.info(buttonName + " button was pushed!")
                     timeBikeAmyPushed = timestampNow
                     if(isBikeAmyOn):
                         await devBikeAmy.async_turn_off(channel=0)
-                        gpioManager.setLed("bikeAmy", False)
+                        gpioManager.setLed(buttonName, False)
                         isBikeAmyOn = False
                     else:
                         await devBikeAmy.async_turn_on(channel=0)
-                        gpioManager.setLed("bikeAmy", True)
+                        gpioManager.setLed(buttonName, True)
                         isBikeAmyOn = True
-            await asyncio.sleep(0.2)
+            
             
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
+            doReset = True
 
     logger.info("Shutting down!")
-    await shutdownPlugs(manager, http_api_client)
+    manager.close()
+    await http_api_client.async_logout()
     logger.info("Plugs shut down")
     GPIO.cleanup()
     logger.info("Shutdown complete!")

@@ -71,28 +71,23 @@ async def shutdownPlugs(manager, http_api_client):
     await http_api_client.async_logout()
 
 doReset = False
-def thread_internet(name):
+async def checkInternet():
     logger = logging.getLogger('merosslogger')
+    global doReset
+    logger.info("checking internet")
+    internetWasLost = False
+    while(True):
+        while(not haveInternet()):
+            internetWasLost = True
+            logger.info("internet is not available, sleeping 1 second")
+            asyncio.sleep(1)
+        
+        if(internetWasLost):
+            logger.info("internet is back, setting doReset to True")
+            doReset = True
+        asyncio.sleep(3)
+
     
-    while not exitapp:
-        try:
-            time.sleep(1)
-            logger.info("checking internet")
-            internetWasLost = False
-            while(not haveInternet()):
-                internetWasLost = True
-                logger.info("internet is not available, sleeping 1 second")
-                time.sleep(1)
-            
-            if(internetWasLost):
-                logger.info(
-                    "internet is back, resetting the stream to firebase")
-                doReset = True
-
-        except Exception as err:
-            logger.error("exception " + traceback.format_exc())
-
-    logger.info("thread_time    : exiting")
 
 
 async def main():
@@ -233,12 +228,10 @@ if __name__ == '__main__':
 
     logger.info("Starting " + appname)
     logger.info("in async def main")
-    
-    internetThread = threading.Thread(target=thread_internet, args=(1,))
-    internetThread.start()
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    taskObj = loop.create_task(checkInternet())
+    loop.run_until_complete(main(), taskObj)
     loop.close()
     logger.info("loop closed")
 

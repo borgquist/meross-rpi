@@ -65,6 +65,10 @@ async def getPlugs(manager):
             devFanRoom = dev
             logger.info(f"found devFanRoom {devFanRoom}")
     doReset = False
+    devBikeFred.async_update()
+    devBikeAmy.async_update()
+    devFanWindow.async_update()
+    devFanRoom.async_update()
 
 async def shutdownPlugs(manager, http_api_client):
     manager.close()
@@ -132,7 +136,7 @@ async def main():
                 devFanWindow.async_update()
                 devFanRoom.async_update()
                 logger.info("done doing async update")
-                
+
                 
 
             timestampNow = time.time()

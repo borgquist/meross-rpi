@@ -89,7 +89,7 @@ async def main():
             await asyncio.sleep(0.2)
             
             # first time is created and then afterwards this is a reset
-            if(doReset):
+            if(doReset and not internetIsLost):
                 logger.info("calling getplugs to do a reaset")
                 doReset = False
                 logger.info("recreating http client")

@@ -119,12 +119,12 @@ async def main():
     logger.info("starting while loop")
     while not exitapp: 
         try:
-            
-            if(doReset):
-                logger.info("calling getplugs to do a reaset")
-                doReset = False
-                await shutdownPlugs(manager, http_api_client)
-                await getPlugs(manager)
+            await asyncio.sleep(0.2)
+            # if(doReset):
+            #     logger.info("calling getplugs to do a reaset")
+            #     doReset = False
+            #     await shutdownPlugs(manager, http_api_client)
+            #     await getPlugs(manager)
 
             timestampNow = time.time()
 
@@ -184,7 +184,7 @@ async def main():
                         await devBikeAmy.async_turn_on(channel=0)
                         gpioManager.setLed("bikeAmy", True)
                         isBikeAmyOn = True
-            await asyncio.sleep(0.2)
+            
             
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())

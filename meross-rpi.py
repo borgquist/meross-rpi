@@ -39,7 +39,6 @@ async def getPlugs(manager):
     global devBikeAmy 
     global devFanWindow
     global devFanRoom 
-    global doReset
     await manager.async_init()
     logger = logging.getLogger('merosslogger')
     
@@ -64,28 +63,26 @@ async def getPlugs(manager):
         if(dev.name == "roomfan"):
             devFanRoom = dev
             logger.info(f"found devFanRoom {devFanRoom}")
-    doReset = False
 
 async def shutdownPlugs(manager, http_api_client):
     manager.close()
     await http_api_client.async_logout()
 
-doReset = False
+
 async def checkInternet():
     logger = logging.getLogger('merosslogger')
-    global doReset
     logger.info("checking internet")
     internetWasLost = False
     while(True):
         while(not haveInternet()):
             internetWasLost = True
-            logger.info("internet is not available, sleeping 1 second")
-            await asyncio.sleep(1)
+            logger.info("internet is not available, sleeping 3 seconds")
+            await asyncio.sleep(3)
         
         if(internetWasLost):
-            logger.info("internet is back, setting doReset to True")
-            doReset = True
-        await asyncio.sleep(3)
+            logger.info("internet is back")
+            internetWasLost = False
+        await asyncio.sleep(10)
 
     
 
@@ -95,7 +92,6 @@ async def main():
     global devBikeAmy 
     global devFanWindow
     global devFanRoom 
-    global doReset
     logger = logging.getLogger('merosslogger')
     
     gpioManager = GpioManager("test")
@@ -120,11 +116,6 @@ async def main():
     while not exitapp: 
         try:
             await asyncio.sleep(0.2)
-            # if(doReset):
-            #     logger.info("calling getplugs to do a reaset")
-            #     doReset = False
-            #     await shutdownPlugs(manager, http_api_client)
-            #     await getPlugs(manager)
 
             timestampNow = time.time()
 

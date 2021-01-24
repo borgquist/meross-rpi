@@ -73,40 +73,9 @@ async def main():
     
     gpioManager = GpioManager("test")
 
-    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
-    # Setup and start the device manager
-    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
     
-    await manager.async_init()
-    logger = logging.getLogger('merosslogger')
+    doReset = True
     
-    # Retrieve all the MSS310 devices that are registered on this account
-    await manager.async_device_discovery()
-    plugs = manager.find_devices()
-
-    for dev in plugs:
-        logger.info(f"- {dev.name} ({dev.type}): {dev.online_status}")
-        if(dev.name == "fredbike"):
-            devBikeFred = dev
-            logger.info(f"found fredbike {devBikeFred}")
-        
-        if(dev.name == "amybike"):
-            devBikeAmy = dev
-            logger.info(f"found devBikeAmy {devBikeAmy}")
-        
-        if(dev.name == "windowfan"):
-            devFanWindow = dev
-            logger.info(f"found devFanWindow {devFanWindow}")
-        
-        if(dev.name == "roomfan"):
-            devFanRoom = dev
-            logger.info(f"found devFanRoom {devFanRoom}")
-    doReset = False
-    await devBikeFred.async_update()
-    await devBikeAmy.async_update()
-    await devFanWindow.async_update()
-    await devFanRoom.async_update()
-
     isFanRoomOn = False
     isFanWindowOn = False
     isBikeAmyOn = False
@@ -120,7 +89,7 @@ async def main():
     logger.info("starting while loop")
     while not exitapp: 
         try:
-            
+            # first time is created and then afterwards this is a reset
             if(doReset):
                 logger.info("calling getplugs to do a reaset")
                 doReset = False

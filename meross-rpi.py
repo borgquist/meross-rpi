@@ -194,7 +194,7 @@ async def main():
                         gpioManager.setLed("bikeAmy", True)
                         isBikeAmyOn = True
             logger.info("trace 6")
-            time.sleep(0.2)
+            asyncio.sleep(0.2)
             logger.info("trace 7")
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())

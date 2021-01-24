@@ -25,7 +25,7 @@ def haveInternet():
 
 async def main():
 
-
+    logger = logging.getLogger('merosslogger')
     exitapp = False
     gpioManager = GpioManager("test")
 
@@ -162,7 +162,7 @@ async def main():
     logger.info("Shutdown complete!")
 
 
-def setup_logger(logger_name, log_file, level=logger.INFO):
+def setup_logger(logger_name, log_file, level=logging.INFO):
     # Erase log if already exists
     if exists(log_file):
         remove(log_file)

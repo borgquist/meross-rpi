@@ -68,15 +68,15 @@ async def main():
             devBikeFred = dev
             logging.info(f"found fredbike {devBikeFred}")
         
-        if(dev.name == "amyBike"):
+        if(dev.name == "amybike"):
             devBikeAmy = dev
             logging.info(f"found devBikeAmy {devBikeAmy}")
         
-        if(dev.name == "windowFan"):
+        if(dev.name == "windowfan"):
             devFanWindow = dev
             logging.info(f"found devFanWindow {devFanWindow}")
         
-        if(dev.name == "roomFan"):
+        if(dev.name == "roomfan"):
             devFanRoom = dev
             logging.info(f"found devFanRoom {devFanRoom}")
 
@@ -159,21 +159,18 @@ async def main():
                     isBikeFredOn = True
 
         
-        if gpioManager.isButtonPushed("bikeAmy"):
-            logging.info("got there")
-            if devBikeAmy is not "notSet":
-                logging.info("got here")
-                if timeBikeAmyPushed < timestampNow - 1:
-                    logging.info("bikeAmy" + " button was pushed!")
-                    timeBikeAmyPushed = timestampNow
-                    if(isBikeAmyOn):
-                        await devBikeAmy.async_turn_off(channel=0)
-                        gpioManager.setLed("bikeAmy", False)
-                        isBikeAmyOn = False
-                    else:
-                        await devBikeAmy.async_turn_on(channel=0)
-                        gpioManager.setLed("bikeAmy", True)
-                        isBikeAmyOn = True
+        if gpioManager.isButtonPushed("bikeAmy") and devBikeAmy is not "notSet":
+            if timeBikeAmyPushed < timestampNow - 1:
+                logging.info("bikeAmy" + " button was pushed!")
+                timeBikeAmyPushed = timestampNow
+                if(isBikeAmyOn):
+                    await devBikeAmy.async_turn_off(channel=0)
+                    gpioManager.setLed("bikeAmy", False)
+                    isBikeAmyOn = False
+                else:
+                    await devBikeAmy.async_turn_on(channel=0)
+                    gpioManager.setLed("bikeAmy", True)
+                    isBikeAmyOn = True
         time.sleep(0.2)
 
     logging.info("Shutting down!")

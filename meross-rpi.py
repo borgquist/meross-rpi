@@ -130,7 +130,7 @@ async def main():
                         gpioManager.setLed("bikeAmy", True)
                         isBikeAmyOn = True
             
-            await asyncio.sleep(0.2)
+            asyncio.sleep(0.2)
             
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())

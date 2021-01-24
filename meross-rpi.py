@@ -80,12 +80,12 @@ async def checkInternet():
         while(not haveInternet()):
             internetWasLost = True
             logger.info("internet is not available, sleeping 1 second")
-            asyncio.sleep(1)
+            await asyncio.sleep(1)
         
         if(internetWasLost):
             logger.info("internet is back, setting doReset to True")
             doReset = True
-        asyncio.sleep(3)
+        await asyncio.sleep(3)
 
     
 

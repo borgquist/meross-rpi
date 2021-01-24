@@ -25,25 +25,7 @@ def haveInternet():
 
 
 async def main():
-    appname = 'meross'
-    folderPath = '/home/pi/'
 
-    configFilePath = '/home/pi/config_meross.json'
-    with open(configFilePath, 'r') as f:
-        configToBeLoaded = json.load(f)
-    EMAIL = configToBeLoaded['username']
-    PASSWORD = configToBeLoaded['password']
-
-    logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
-                    datefmt='%Y-%m-%d:%H:%M:%S',
-                    level=logging.INFO,
-                    handlers=[
-                        logging.FileHandler(
-                            folderPath +appname+".log"),
-                        logging.StreamHandler()
-                    ])
-    logging.info("Starting " + appname)
-    logging.info("in async def main")
 
     exitapp = False
     gpioManager = GpioManager("test")
@@ -181,6 +163,26 @@ async def main():
     logging.info("Shutdown complete!")
 
 if __name__ == '__main__':
+
+    appname = 'meross'
+    folderPath = '/home/pi/'
+
+    configFilePath = '/home/pi/config_meross.json'
+    with open(configFilePath, 'r') as f:
+        configToBeLoaded = json.load(f)
+    EMAIL = configToBeLoaded['username']
+    PASSWORD = configToBeLoaded['password']
+
+    logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+                    datefmt='%Y-%m-%d:%H:%M:%S',
+                    level=logging.INFO,
+                    handlers=[
+                        logging.FileHandler(
+                            folderPath +appname+".log"),
+                        logging.StreamHandler()
+                    ])
+    logging.info("Starting " + appname)
+    logging.info("in async def main")
     # On Windows + Python 3.8, you should uncomment the following
     # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     loop = asyncio.get_event_loop()

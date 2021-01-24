@@ -98,7 +98,7 @@ def thread_internet(name):
                 internetWasLost = True
                 logger.info("internet is not available, sleeping 1 second")
                 time.sleep(1)
-            wanOk = wan_ok()
+            wanOk = wan_ok('$\x1a\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x03www\x06google\x03com\x00\x00\x01\x00\x01')
             print("wanOk was [" + wanOk + "]")
             if(internetWasLost):
                 logger.info(

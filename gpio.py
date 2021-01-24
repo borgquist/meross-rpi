@@ -1,5 +1,4 @@
 import RPi.GPIO as GPIO
-import logging
 
 class GpioManager:
     name = ""
@@ -29,7 +28,6 @@ class GpioManager:
 
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    logging.info("GPIO setup complete")
 
     class Button:
         buttonPin = 0
@@ -58,14 +56,12 @@ class GpioManager:
             return self.fanWindow
         if(buttonName == "fanRoom"):
             return self.fanRoom
-        logging.warning("couldn't find " + buttonName)
         return 0
 
 
     def isButtonPushed(self, buttonName):
         button = self.getButton(buttonName)
         if GPIO.input(button.buttonPin) == GPIO.HIGH:
-            logging.info("GpioManager button [" + button.name  + "] [" + buttonName + "] was pushed!")
             return True
         return False
 

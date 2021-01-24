@@ -124,70 +124,73 @@ async def main():
 
     logger.info("starting while loop")
     while not exitapp: 
-        if(doReset):
-            logger.info("calling getplugs to do a reaset")
-            await getPlugs(manager)
-            doReset = False
+        try:
+            if(doReset):
+                logger.info("calling getplugs to do a reaset")
+                await getPlugs(manager)
+                doReset = False
 
-        timestampNow = time.time()
+            timestampNow = time.time()
 
-        buttonName = "fanRoom"
-        if gpioManager.isButtonPushed("fanRoom") and devFanRoom is not "notSet":
-            if timeFanRoomPushed < timestampNow - 1:
-                logger.info(buttonName + " button was pushed!")
-                timeFanRoomPushed = timestampNow
-                if(isFanRoomOn):
-                    await devFanRoom.async_turn_off(channel=0)
-                    gpioManager.setLed(buttonName, False)
-                    isFanRoomOn = False
-                else:
-                    await devFanRoom.async_turn_on(channel=0)
-                    gpioManager.setLed(buttonName, True)
-                    isFanRoomOn = True
-                
+            buttonName = "fanRoom"
+            if gpioManager.isButtonPushed("fanRoom") and devFanRoom is not "notSet":
+                if timeFanRoomPushed < timestampNow - 1:
+                    logger.info(buttonName + " button was pushed!")
+                    timeFanRoomPushed = timestampNow
+                    if(isFanRoomOn):
+                        await devFanRoom.async_turn_off(channel=0)
+                        gpioManager.setLed(buttonName, False)
+                        isFanRoomOn = False
+                    else:
+                        await devFanRoom.async_turn_on(channel=0)
+                        gpioManager.setLed(buttonName, True)
+                        isFanRoomOn = True
+                    
 
-        buttonName = "fanWindow"
-        if gpioManager.isButtonPushed("fanWindow") and devFanWindow is not "notSet":
-            if timeFanWindowPushed < timestampNow - 1:
-                logger.info(buttonName + " button was pushed!")
-                timeFanWindowPushed = timestampNow
-                if(isFanWindowOn):
-                    await devFanWindow.async_turn_off(channel=0)
-                    gpioManager.setLed(buttonName, False)
-                    isFanWindowOn = False
-                else:
-                    await devFanWindow.async_turn_on(channel=0)
-                    gpioManager.setLed(buttonName, True)
-                    isFanWindowOn = True
-                
-        buttonName = "bikeFred"
-        if gpioManager.isButtonPushed("bikeFred") and devBikeFred is not "notSet":
-            if timeBikeFredPushed < timestampNow - 1:
-                logger.info(buttonName + " button was pushed!")
-                timeBikeFredPushed = timestampNow
-                if(isBikeFredOn):
-                    await devBikeFred.async_turn_off(channel=0)
-                    gpioManager.setLed(buttonName, False)
-                    isBikeFredOn = False
-                else:
-                    await devBikeFred.async_turn_on(channel=0)
-                    gpioManager.setLed(buttonName, True)
-                    isBikeFredOn = True
+            buttonName = "fanWindow"
+            if gpioManager.isButtonPushed("fanWindow") and devFanWindow is not "notSet":
+                if timeFanWindowPushed < timestampNow - 1:
+                    logger.info(buttonName + " button was pushed!")
+                    timeFanWindowPushed = timestampNow
+                    if(isFanWindowOn):
+                        await devFanWindow.async_turn_off(channel=0)
+                        gpioManager.setLed(buttonName, False)
+                        isFanWindowOn = False
+                    else:
+                        await devFanWindow.async_turn_on(channel=0)
+                        gpioManager.setLed(buttonName, True)
+                        isFanWindowOn = True
+                    
+            buttonName = "bikeFred"
+            if gpioManager.isButtonPushed("bikeFred") and devBikeFred is not "notSet":
+                if timeBikeFredPushed < timestampNow - 1:
+                    logger.info(buttonName + " button was pushed!")
+                    timeBikeFredPushed = timestampNow
+                    if(isBikeFredOn):
+                        await devBikeFred.async_turn_off(channel=0)
+                        gpioManager.setLed(buttonName, False)
+                        isBikeFredOn = False
+                    else:
+                        await devBikeFred.async_turn_on(channel=0)
+                        gpioManager.setLed(buttonName, True)
+                        isBikeFredOn = True
 
-        
-        if gpioManager.isButtonPushed("bikeAmy") and devBikeAmy is not "notSet":
-            if timeBikeAmyPushed < timestampNow - 1:
-                logger.info("bikeAmy" + " button was pushed!")
-                timeBikeAmyPushed = timestampNow
-                if(isBikeAmyOn):
-                    await devBikeAmy.async_turn_off(channel=0)
-                    gpioManager.setLed("bikeAmy", False)
-                    isBikeAmyOn = False
-                else:
-                    await devBikeAmy.async_turn_on(channel=0)
-                    gpioManager.setLed("bikeAmy", True)
-                    isBikeAmyOn = True
-        time.sleep(0.2)
+            
+            if gpioManager.isButtonPushed("bikeAmy") and devBikeAmy is not "notSet":
+                if timeBikeAmyPushed < timestampNow - 1:
+                    logger.info("bikeAmy" + " button was pushed!")
+                    timeBikeAmyPushed = timestampNow
+                    if(isBikeAmyOn):
+                        await devBikeAmy.async_turn_off(channel=0)
+                        gpioManager.setLed("bikeAmy", False)
+                        isBikeAmyOn = False
+                    else:
+                        await devBikeAmy.async_turn_on(channel=0)
+                        gpioManager.setLed("bikeAmy", True)
+                        isBikeAmyOn = True
+            time.sleep(0.2)
+        except Exception as err:
+            logger.error("exception in main " + traceback.format_exc())
 
     logger.info("Shutting down!")
     await shutdownPlugs(manager, http_api_client)

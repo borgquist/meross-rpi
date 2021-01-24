@@ -49,14 +49,19 @@ class GpioManager:
 
     def getButton(self, buttonName):
         print("comparing " + buttonName)
-        if(buttonName == "fredBike"):
+        if(buttonName == "bikeFred"):
+            print("returning " + self.bikeFred)
             return self.bikeFred
-        if(buttonName == "amyBike"):
+        if(buttonName == "bikeAmy"):
+            print("returning " + self.bikeAmy)
             return self.bikeAmy
-        if(buttonName == "windowFan"):
+        if(buttonName == "fanWindow"):
+            print("returning " + self.fanWindow)
             return self.fanWindow
-        if(buttonName == "roomFan"):
+        if(buttonName == "fanRoom"):
+            print("returning " + self.fanRoom)
             return self.fanRoom
+            
         return 0
 
 

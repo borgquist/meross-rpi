@@ -2,9 +2,9 @@ import RPi.GPIO as GPIO
 import logging
 
 class GpioManager:
-    cpuid = ""
-    def __init__(self, cpuid):
-        self.cpuid = cpuid
+    name = ""
+    def __init__(self, name):
+        self.name = name
     
     fanRoomPin = 27
     fanWindowPin = 23
@@ -50,26 +50,20 @@ class GpioManager:
     fanWindow = Button(fanWindowPin, fanWindowLedPin, "fanWindow")
 
     def getButton(self, buttonName):
-        print("comparing " + buttonName)
         if(buttonName == "bikeFred"):
-            print("returning " + str(self.bikeFred))
             return self.bikeFred
         if(buttonName == "bikeAmy"):
-            print("returning " + str(self.bikeAmy))
             return self.bikeAmy
         if(buttonName == "fanWindow"):
-            print("returning " + str(self.fanWindow))
             return self.fanWindow
         if(buttonName == "fanRoom"):
-            print("returning " + str(self.fanRoom))
             return self.fanRoom
-            
+        logging.warning("couldn't find " + buttonName)
         return 0
 
 
     def isButtonPushed(self, buttonName):
         button = self.getButton(buttonName)
-        print(button)
         if GPIO.input(button.buttonPin) == GPIO.HIGH:
             logging.info(button.name  + " button was pushed!")
             return True

@@ -120,12 +120,11 @@ async def main():
     timeFanWindowPushed = 0
     timeBikeFredPushed = 0
     timeBikeAmyPushed = 0
-    timestampInternetCheck = 0
 
     logger.info("starting while loop")
     while not exitapp: 
         try:
-            logger.info("trace 1")
+            
             if(doReset):
                 logger.info("calling getplugs to do a reaset")
                 await getPlugs(manager)
@@ -135,7 +134,6 @@ async def main():
 
             buttonName = "fanRoom"
             if gpioManager.isButtonPushed("fanRoom"):
-                logger.info("trace 2")
                 if timeFanRoomPushed < timestampNow - 1:
                     logger.info(buttonName + " button was pushed!")
                     timeFanRoomPushed = timestampNow
@@ -151,7 +149,6 @@ async def main():
 
             buttonName = "fanWindow"
             if gpioManager.isButtonPushed("fanWindow"):
-                logger.info("trace 3")
                 if timeFanWindowPushed < timestampNow - 1:
                     logger.info(buttonName + " button was pushed!")
                     timeFanWindowPushed = timestampNow
@@ -166,7 +163,6 @@ async def main():
                     
             buttonName = "bikeFred"
             if gpioManager.isButtonPushed("bikeFred"):
-                logger.info("trace 4")
                 if timeBikeFredPushed < timestampNow - 1:
                     logger.info(buttonName + " button was pushed!")
                     timeBikeFredPushed = timestampNow
@@ -181,7 +177,6 @@ async def main():
 
             
             if gpioManager.isButtonPushed("bikeAmy"):
-                logger.info("trace 5")
                 if timeBikeAmyPushed < timestampNow - 1:
                     logger.info("bikeAmy" + " button was pushed!")
                     timeBikeAmyPushed = timestampNow
@@ -193,9 +188,8 @@ async def main():
                         await devBikeAmy.async_turn_on(channel=0)
                         gpioManager.setLed("bikeAmy", True)
                         isBikeAmyOn = True
-            logger.info("trace 6")
-            asyncio.sleep(0.2)
-            logger.info("trace 7")
+            await asyncio.sleep(0.2)
+            
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
 

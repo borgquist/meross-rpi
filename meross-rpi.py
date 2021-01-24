@@ -11,7 +11,7 @@ from os import remove
 from os.path import exists
 
 
-def haveInternet():
+async def haveInternet():
     googleHostForInternetCheck = "8.8.8.8"
     try:
         output = subprocess.check_output(
@@ -22,13 +22,16 @@ def haveInternet():
 
     return True
 
+devBikeFred = "notSet"
+devBikeAmy = "notSet"
+devFanWindow = "notSet"
+devFanRoom = "notSet"
 
-async def main():
-
-    logger = logging.getLogger('merosslogger')
-    exitapp = False
-    gpioManager = GpioManager("test")
-
+async def getPlugs():
+    global devBikeFred 
+    global devBikeAmy 
+    global devFanWindow
+    global devFanRoom 
 
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
     # Setup and start the device manager
@@ -38,11 +41,6 @@ async def main():
     # Retrieve all the MSS310 devices that are registered on this account
     await manager.async_device_discovery()
     plugs = manager.find_devices()
-
-    devBikeFred = "notSet"
-    devBikeAmy = "notSet"
-    devFanWindow = "notSet"
-    devFanRoom = "notSet"
 
     for dev in plugs:
         logger.info(f"- {dev.name} ({dev.type}): {dev.online_status}")
@@ -61,6 +59,24 @@ async def main():
         if(dev.name == "roomfan"):
             devFanRoom = dev
             logger.info(f"found devFanRoom {devFanRoom}")
+
+async def main():
+    global devBikeFred 
+    global devBikeAmy 
+    global devFanWindow
+    global devFanRoom 
+    
+    logger = logging.getLogger('merosslogger')
+    exitapp = False
+    gpioManager = GpioManager("test")
+
+    internetAvailable = await haveInternet()
+    if(internetAvailable):
+        logger.info("internet is available")
+    else:
+        logger.info("internet is NOT available")
+
+    getPlugs()
 
     isFanRoomOn = False
     isFanWindowOn = False

@@ -65,10 +65,10 @@ async def getPlugs(manager):
             devFanRoom = dev
             logger.info(f"found devFanRoom {devFanRoom}")
     doReset = False
-    devBikeFred.async_update()
-    devBikeAmy.async_update()
-    devFanWindow.async_update()
-    devFanRoom.async_update()
+    await devBikeFred.async_update()
+    await devBikeAmy.async_update()
+    await devFanWindow.async_update()
+    await devFanRoom.async_update()
 
 async def shutdownPlugs(manager, http_api_client):
     manager.close()
@@ -131,10 +131,10 @@ async def main():
                 logger.info("calling getplugs to do a reaset")
                 doReset = False
                 logger.info("doing async update")
-                devBikeFred.async_update()
-                devBikeAmy.async_update()
-                devFanWindow.async_update()
-                devFanRoom.async_update()
+                await devBikeFred.async_update()
+                await devBikeAmy.async_update()
+                await devFanWindow.async_update()
+                await devFanRoom.async_update()
                 logger.info("done doing async update")
 
                 

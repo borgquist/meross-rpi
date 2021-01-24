@@ -10,23 +10,10 @@ from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 from gpio import GpioManager
 
-appname = 'merross'
-folderPath = '/home/pi/'
-logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.INFO)
-logging.info("Starting " + appname)
 
-configFilePath = '/home/pi/meross.json'
-with open(configFilePath, 'r') as f:
-    configToBeLoaded = json.load(f)
-EMAIL = configToBeLoaded['username']
-PASSWORD = configToBeLoaded['password']
 
-exitapp = False
-
-gpioManager = GpioManager("test")
-
-googleHostForInternetCheck = "8.8.8.8"
 def haveInternet():
+    googleHostForInternetCheck = "8.8.8.8"
     try:
         output = subprocess.check_output(
             "ping -c 1 {}".format(googleHostForInternetCheck), shell=True)
@@ -38,7 +25,29 @@ def haveInternet():
 
 
 async def main():
+    appname = 'meross'
+    folderPath = '/home/pi/'
+
+    configFilePath = '/home/pi/config_meross.json'
+    with open(configFilePath, 'r') as f:
+        configToBeLoaded = json.load(f)
+    EMAIL = configToBeLoaded['username']
+    PASSWORD = configToBeLoaded['password']
+
+    logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+                    datefmt='%Y-%m-%d:%H:%M:%S',
+                    level=logging.INFO,
+                    handlers=[
+                        logging.FileHandler(
+                            folderPath +appname+".log"),
+                        logging.StreamHandler()
+                    ])
+    logging.info("Starting " + appname)
     logging.info("in async def main")
+
+    exitapp = False
+    gpioManager = GpioManager("test")
+
 
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
     # Setup and start the device manager

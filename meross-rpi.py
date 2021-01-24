@@ -34,7 +34,7 @@ async def getPlugs(manager):
     global devBikeAmy 
     global devFanWindow
     global devFanRoom 
-
+    global doReset
     await manager.async_init()
 
     # Retrieve all the MSS310 devices that are registered on this account
@@ -58,7 +58,8 @@ async def getPlugs(manager):
         if(dev.name == "roomfan"):
             devFanRoom = dev
             logger.info(f"found devFanRoom {devFanRoom}")
-            
+    doReset = False
+
 async def shutdownPlugs(manager, http_api_client):
     manager.close()
     await http_api_client.async_logout()
@@ -69,10 +70,7 @@ def thread_internet(name):
     
     while not exitapp:
         try:
-            timestampNow = time.time()
-            
-            time.sleep(5)
-
+            logger.info("checking internet")
             internetWasLost = False
             while(not haveInternet()):
                 internetWasLost = True
@@ -83,6 +81,7 @@ def thread_internet(name):
                 logger.info(
                     "internet is back, resetting the stream to firebase")
                 doReset = True
+            time.sleep(1)
 
         except Exception as err:
             logger.error("exception " + traceback.format_exc())
@@ -94,7 +93,7 @@ async def main():
     global devBikeAmy 
     global devFanWindow
     global devFanRoom 
-
+    global doReset
     logger = logging.getLogger('merosslogger')
     
     gpioManager = GpioManager("test")
@@ -124,6 +123,10 @@ async def main():
 
     logger.info("starting while loop")
     while not exitapp: 
+        if(doReset):
+            logger.info("calling getplugs to do a reaset")
+            await getPlugs(manager)
+            doReset = False
 
         timestampNow = time.time()
 

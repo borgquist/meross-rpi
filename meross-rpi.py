@@ -124,9 +124,12 @@ async def main():
             if(doReset):
                 logger.info("calling getplugs to do a reaset")
                 doReset = False
+                logger.info("recreating http client")
+                http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
+                logger.info("recreating manager")
+                manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
                 logger.info("doing manager.async_init")
                 await manager.async_init()
-    
                 logger.info("doing async update")
 
                 await devBikeFred.async_update()

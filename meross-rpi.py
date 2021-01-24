@@ -102,7 +102,7 @@ async def main():
 
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
     # Setup and start the device manager
-    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 10, requests_per_second_limit = 10)
+    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 1)
     
     await getPlugs(manager)
 

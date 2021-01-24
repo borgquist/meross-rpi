@@ -159,18 +159,17 @@ async def main():
                     isBikeFredOn = True
 
         
-        buttonName = "bikeAmy"
-        if gpioManager.isButtonPushed(buttonName)  and devBikeAmy is not "notSet":
+        if gpioManager.isButtonPushed("bikeAmy")  and devBikeAmy is not "notSet":
             if timeBikeAmyPushed < timestampNow - 1:
-                logging.info(buttonName + " button was pushed!")
+                logging.info("bikeAmy" + " button was pushed!")
                 timeBikeAmyPushed = timestampNow
                 if(isBikeAmyOn):
                     await devBikeAmy.async_turn_off(channel=0)
-                    gpioManager.setLed(buttonName, False)
+                    gpioManager.setLed("bikeAmy", False)
                     isBikeAmyOn = False
                 else:
                     await devBikeAmy.async_turn_on(channel=0)
-                    gpioManager.setLed(buttonName, True)
+                    gpioManager.setLed("bikeAmy", True)
                     isBikeAmyOn = True
         time.sleep(0.2)
 

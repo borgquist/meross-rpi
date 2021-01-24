@@ -31,7 +31,7 @@ PASSWORD = configToBeLoaded['password']
 
 exitapp = False
 
-gpioManager = GpioManager 
+gpioManager = GpioManager("test")
 
 googleHostForInternetCheck = "8.8.8.8"
 def haveInternet():

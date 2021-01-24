@@ -2,7 +2,10 @@ import RPi.GPIO as GPIO
 import logging
 
 class GpioManager:
-
+    cpuid = ""
+    def __init__(self, cpuid):
+        self.cpuid = cpuid
+    
     fanRoomPin = 27
     fanWindowPin = 23
     bikeFredPin = 5

@@ -27,6 +27,7 @@ async def haveInternet():
 # Check internet connectivity by sending DNS lookup to Google's 8.8.8.8
 async def wan_ok(self, packet = b'$\x1a\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x03www\x06google\x03com\x00\x00\x01\x00\x01'):
     if not self.isconnected():  # WiFi is down
+        logger.info("wanOk was False isconnected")
         return False
     length = 32  # DNS query and response packet size
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -38,11 +39,14 @@ async def wan_ok(self, packet = b'$\x1a\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\
         await asyncio.sleep(2)
         res = await self._as_read(length, s)
         if len(res) == length:
+            logger.info("wanOk was True res length")
             return True  # DNS response size OK
     except OSError:  # Timeout on read: no connectivity.
+        logger.info("wanOk was False os error")
         return False
     finally:
         s.close()
+    logger.info("wanOk was False")
     return False
 
 devBikeFred = "notSet"

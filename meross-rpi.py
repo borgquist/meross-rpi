@@ -2,7 +2,6 @@ import asyncio
 import RPi.GPIO as GPIO
 import time
 import logging
-import socket
 import subprocess
 import json
 from meross_iot.http_api import MerossHttpClient
@@ -11,7 +10,8 @@ from gpio import GpioManager
 from os import remove
 from os.path import exists
 import traceback
-import threading
+import signal
+import functools
 
 
 def haveInternet():
@@ -53,6 +53,7 @@ async def checkInternet():
             await asyncio.sleep(3)
     except asyncio.CancelledError:
         logger.info("asyncio.CancelledError, in checkInternet")
+        return "checkInternet cancelled"
                 
     
 
@@ -227,6 +228,7 @@ async def main():
     logger.info("http_api_client.async_logout")
     GPIO.cleanup()
     logger.info("Shutdown complete!")
+    return "main cancelled"
 
 
 def setup_logger(logger_name, log_file, level=logging.INFO):
@@ -244,14 +246,15 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
     l.addHandler(fileHandler)
     l.addHandler(streamHandler)
 
-async def shutdown(loop):
-    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-    for task in tasks:
-        task.cancel()
-    print(f"Cancelling {len(tasks)} outstanding tasks")
+async def shutdown(sig, loop):
+    print('caught {0}'.format(sig.name))
+    tasks = [task for task in asyncio.Task.all_tasks() if task is not
+             asyncio.tasks.Task.current_task()]
+    list(map(lambda task: task.cancel(), tasks))
     results = await asyncio.gather(*tasks, return_exceptions=True)
-    print(f"results: {results}")
+    print('finished awaiting cancelled tasks, results: {0}'.format(results))
     loop.stop()
+ 
 
 if __name__ == '__main__':
     appname = 'meross'
@@ -270,21 +273,19 @@ if __name__ == '__main__':
     logger.info("in async def main")
 
     loop = asyncio.get_event_loop()
-    i_created = []
+    asyncio.ensure_future(checkInternet(), loop=loop)
+    asyncio.ensure_future(main(), loop=loop)
+    loop.add_signal_handler(signal.SIGTERM,
+                            functools.partial(asyncio.ensure_future,
+                                            shutdown(signal.SIGTERM, loop)))
+    loop.add_signal_handler(signal.SIGINT,
+                            functools.partial(asyncio.ensure_future,
+                                            shutdown(signal.SIGTERM, loop)))
+
     try:
-        taskInternet = loop.create_task(checkInternet())
-        taskMain = loop.create_task(main())
-        i_created.append(taskInternet)
-        i_created.append(taskMain)
         loop.run_forever()
-    except KeyboardInterrupt:
-        logger.info("Process interrupted")
     finally:
-        for task in i_created:
-            logger.info("cancelling task")
-            task.cancel()
         loop.close()
-        logger.info("Successfully shutdown the meross service.")
-    exitapp = True
-    logger.info("loop closed")
+        logger.info("loop closed")
+    
 

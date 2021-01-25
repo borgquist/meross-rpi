@@ -72,11 +72,7 @@ async def main(loop):
     doReset = True
     firstRun = True
 
-    logger.info("recreating http client")
-    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
-    logger.info("recreating manager")
-    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
-
+    
     isFanRoomOn = False
     isFanWindowOn = False
     isBikeAmyOn = False
@@ -100,13 +96,11 @@ async def main(loop):
             # first time is created and then afterwards this is a reset
             if(doReset and not internetIsLost):
                 doReset = False
-                if firstRun:
-                    firstRun = False
-                else:
-                    logger.info("recreating http client")
-                    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
-                    logger.info("recreating manager")
-                    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
+
+                logger.info("recreating http client")
+                http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
+                logger.info("recreating manager")
+                manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
                 logger.info("doing manager.async_init")
                 await manager.async_init()
                 logger.info("doing async update")
@@ -212,6 +206,7 @@ async def main(loop):
         except asyncio.CancelledError:
             logger.info("CancelledError received")
             exitapp = True
+            return 
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
             doReset = True

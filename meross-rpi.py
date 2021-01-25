@@ -204,7 +204,10 @@ async def main():
             
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
+            manager.close()
+            await http_api_client.async_logout()
             doReset = True
+            await asyncio.sleep(3)
 
     logger.info("Shutting down!")
     manager.close()

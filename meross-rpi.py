@@ -244,6 +244,14 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
     l.addHandler(fileHandler)
     l.addHandler(streamHandler)
 
+async def shutdown(loop):
+    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+    for task in tasks:
+        task.cancel()
+    print(f"Cancelling {len(tasks)} outstanding tasks")
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    print(f"results: {results}")
+    loop.stop()
 
 if __name__ == '__main__':
     appname = 'meross'
@@ -262,16 +270,19 @@ if __name__ == '__main__':
     logger.info("in async def main")
 
     loop = asyncio.get_event_loop()
+    i_created = []
     try:
-        loop.create_task(checkInternet())
-        loop.create_task(main())
+        taskInternet = loop.create_task(checkInternet())
+        taskMain = loop.create_task(main())
+        i_created.append(taskInternet)
+        i_created.append(taskMain)
         loop.run_forever()
     except KeyboardInterrupt:
         logger.info("Process interrupted")
     finally:
-        for task in asyncio.Task.all_tasks():
+        for task in i_created:
+            logger.info("cancelling task")
             task.cancel()
-        asyncio.sleep(5)
         loop.close()
         logger.info("Successfully shutdown the meross service.")
     exitapp = True

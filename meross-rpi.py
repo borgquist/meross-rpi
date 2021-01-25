@@ -36,11 +36,11 @@ exitapp = False
 
     
 
-doReset = False
+
 internetIsLost = False
 async def checkInternet():
     logger = logging.getLogger('merosslogger')
-    global doReset
+    # global doReset
     global internetIsLost
     logger.info("checking internet")
     while(True):
@@ -51,7 +51,7 @@ async def checkInternet():
         
         if internetIsLost:
             logger.info("internet is back")
-            doReset = True
+            #doReset = True
             internetIsLost = False
             
         await asyncio.sleep(3)
@@ -64,7 +64,6 @@ async def main():
     global devBikeAmy 
     global devFanWindow
     global devFanRoom 
-    global doReset
     global internetIsLost
     logger = logging.getLogger('merosslogger')
     
@@ -119,7 +118,7 @@ async def main():
                     if(dev.name == "roomfan"):
                         devFanRoom = dev
                         logger.info(f"found devFanRoom {devFanRoom}")
-                doReset = False
+                
                 await devBikeFred.async_update()
                 await devBikeAmy.async_update()
                 await devFanWindow.async_update()

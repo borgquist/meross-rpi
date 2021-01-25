@@ -206,7 +206,6 @@ async def main(loop):
         except asyncio.CancelledError:
             logger.info("CancelledError received")
             exitapp = True
-            return 
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
             doReset = True

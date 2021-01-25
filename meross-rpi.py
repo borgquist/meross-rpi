@@ -210,27 +210,35 @@ async def main():
                         gpioManager.setLed(buttonName, True)
                         isBikeAmyOn = True
             
-            
+        except asyncio.CancelledError:
+            logger.info("CancelledError received")
+            manager.close()
+            logger.info("Manager closed")
+            await http_api_client.async_logout()
+            logger.info("http_api_client.async_logout")
+            return
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
             doReset = True
             manager.close()
+            logger.info("Manager closed")
             await http_api_client.async_logout()
+            logger.info("http_api_client.async_logout")
             await asyncio.sleep(3)
 
     logger.info("Shutting down!")
-    manager.stop(True)
     manager.close()
+    logger.info("Manager closed")
     await http_api_client.async_logout()
-    logger.info("Plugs shut down")
+    logger.info("http_api_client.async_logout")
     GPIO.cleanup()
     logger.info("Shutdown complete!")
 
 
 def setup_logger(logger_name, log_file, level=logging.INFO):
-    # Erase log if already exists
-    if exists(log_file):
-        remove(log_file)
+    # # Erase log if already exists
+    # if exists(log_file):
+    #     remove(log_file)
     # Configure log file
     l = logging.getLogger(logger_name)
     formatter = logging.Formatter('%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
@@ -244,10 +252,8 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
 
 
 if __name__ == '__main__':
-
     appname = 'meross'
     folderPath = '/home/pi/'
-
     configFilePath = '/home/pi/config_meross.json'
     with open(configFilePath, 'r') as f:
         configToBeLoaded = json.load(f)
@@ -262,9 +268,15 @@ if __name__ == '__main__':
     logger.info("in async def main")
 
     loop = asyncio.get_event_loop()
-    loop.create_task(checkInternet())
-    loop.create_task(main())
-    loop.run_forever()
-    
+    try:
+        loop.create_task(checkInternet())
+        loop.create_task(main())
+        loop.run_forever()
+    except KeyboardInterrupt:
+        logging.info("Process interrupted")
+    finally:
+        loop.close()
+        logging.info("Successfully shutdown the meross service.")
+    exitapp = True
     logger.info("loop closed")
 

@@ -33,7 +33,7 @@ devFanRoom = "notSet"
 
 
 internetIsLost = False
-async def checkInternet():
+async def checkInternet(loop):
     logger = logging.getLogger('merosslogger')
     # global doReset
     global internetIsLost
@@ -43,14 +43,14 @@ async def checkInternet():
             while(not haveInternet()):
                 internetIsLost = True
                 logger.info("internet is not available, sleeping 1 second")
-                await asyncio.sleep(1)
+                await asyncio.sleep(1, loop=loop)
             
             if internetIsLost:
                 logger.info("internet is back")
                 #doReset = True
                 internetIsLost = False
                 
-            await asyncio.sleep(3)
+            await asyncio.sleep(3, loop=loop)
     except asyncio.CancelledError:
         logger.info("asyncio.CancelledError, in checkInternet")
         return "checkInternet cancelled"
@@ -58,7 +58,7 @@ async def checkInternet():
     
 
 
-async def main():
+async def main(loop):
     global devBikeFred 
     global devBikeAmy 
     global devFanWindow
@@ -95,7 +95,7 @@ async def main():
     logger.info("starting while loop")
     while not exitapp: 
         try:
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.1, loop=loop)
             
             # first time is created and then afterwards this is a reset
             if(doReset and not internetIsLost):
@@ -137,7 +137,7 @@ async def main():
                 await devFanWindow.async_update()
                 await devFanRoom.async_update()
                 logger.info("done doing async update, sleeping 3 seconds to prevent races")
-                await asyncio.sleep(3)
+                await asyncio.sleep(3, loop=loop)
 
                 
             
@@ -219,7 +219,7 @@ async def main():
             logger.info("Manager closed")
             await http_api_client.async_logout()
             logger.info("http_api_client.async_logout")
-            await asyncio.sleep(3)
+            await asyncio.sleep(3, loop=loop)
 
     logger.info("Shutting down!")
     manager.close()
@@ -273,8 +273,8 @@ if __name__ == '__main__':
     logger.info("in async def main")
 
     loop = asyncio.get_event_loop()
-    asyncio.ensure_future(checkInternet(), loop=loop)
-    asyncio.ensure_future(main(), loop=loop)
+    asyncio.ensure_future(main(loop), loop=loop)
+    asyncio.ensure_future(checkInternet(loop), loop=loop)
     loop.add_signal_handler(signal.SIGTERM,
                             functools.partial(asyncio.ensure_future,
                                             shutdown(signal.SIGTERM, loop)))

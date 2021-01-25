@@ -64,6 +64,11 @@ class GpioManager:
         if GPIO.input(button.buttonPin) == GPIO.HIGH:
             return True
         return False
+        
+    def isButtonPinPushed(self, buttonPin):
+        if GPIO.input(buttonPin) == GPIO.HIGH:
+            return True
+        return False
 
     def setLed(self, buttonName, setOn):
         button = self.getButton(buttonName)

@@ -82,10 +82,15 @@ async def main():
     timeBikeFredPushed = 0
     timeBikeAmyPushed = 0
 
+    fanRoomPin = 27
+    fanWindowPin = 23
+    bikeFredPin = 5
+    bikeAmyPin = 17
+
     logger.info("starting while loop")
     while not exitapp: 
         try:
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(0.1)
             
             # first time is created and then afterwards this is a reset
             if(doReset and not internetIsLost):
@@ -131,10 +136,10 @@ async def main():
             timestampNow = time.time()
 
             buttonName = "fanRoom"
-            if gpioManager.isButtonPushed("fanRoom"):
+            if gpioManager.isButtonPinPushed(fanRoomPin):
                 if(internetIsLost):
                     logger.info("not processing " + buttonName + " button press since internet is lost")
-                elif timeFanRoomPushed < timestampNow - 1:
+                elif timeFanRoomPushed < timestampNow - 0.5:
                     logger.info(buttonName + " button was pushed!")
                     timeFanRoomPushed = timestampNow
                     if(isFanRoomOn):
@@ -148,10 +153,10 @@ async def main():
                     
 
             buttonName = "fanWindow"
-            if gpioManager.isButtonPushed("fanWindow"):
+            if gpioManager.isButtonPinPushed(fanWindowPin):
                 if(internetIsLost):
                     logger.info("not processing " + buttonName + " button press since internet is lost")
-                elif timeFanWindowPushed < timestampNow - 1:
+                elif timeFanWindowPushed < timestampNow - 0.5:
                     logger.info(buttonName + " button was pushed!")
                     timeFanWindowPushed = timestampNow
                     if(isFanWindowOn):
@@ -164,10 +169,10 @@ async def main():
                         isFanWindowOn = True
                     
             buttonName = "bikeFred"
-            if gpioManager.isButtonPushed(buttonName):
+            if gpioManager.isButtonPinPushed(bikeFredPin):
                 if(internetIsLost):
                     logger.info("not processing " + buttonName + " button press since internet is lost")
-                elif timeBikeFredPushed < timestampNow - 1:
+                elif timeBikeFredPushed < timestampNow - 0.5:
                     logger.info(buttonName + " button was pushed!")
                     timeBikeFredPushed = timestampNow
                     if(isBikeFredOn):
@@ -181,10 +186,10 @@ async def main():
 
             
             buttonName = "bikeAmy"
-            if gpioManager.isButtonPushed(buttonName):
+            if gpioManager.isButtonPinPushed(bikeAmyPin):
                 if(internetIsLost):
                     logger.info("not processing " + buttonName + " button press since internet is lost")
-                elif timeBikeAmyPushed < timestampNow - 1:
+                elif timeBikeAmyPushed < timestampNow - 0.5:
                     logger.info(buttonName + " button was pushed!")
                     timeBikeAmyPushed = timestampNow
                     if(isBikeAmyOn):

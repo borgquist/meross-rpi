@@ -271,6 +271,7 @@ if __name__ == '__main__':
     finally:
         for task in asyncio.Task.all_tasks():
             task.cancel()
+        asyncio.sleep(5)
         loop.close()
         logger.info("Successfully shutdown the meross service.")
     exitapp = True

@@ -27,6 +27,9 @@ for i in range(5):
 loop.add_signal_handler(signal.SIGTERM,
                         functools.partial(asyncio.ensure_future,
                                           shutdown(signal.SIGTERM, loop)))
+loop.add_signal_handler(signal.SIGINT,
+                        functools.partial(asyncio.ensure_future,
+                                          shutdown(signal.SIGTERM, loop)))
 try:
     loop.run_forever()
 finally:

@@ -18,7 +18,7 @@ def haveInternet():
     googleHostForInternetCheck = "8.8.8.8"
     try:
         output = subprocess.check_output(
-            "ping -c 1 {}".format(googleHostForInternetCheck), shell=True)
+            "ping -c 5 {}".format(googleHostForInternetCheck), shell=True)
 
     except Exception:
         return False

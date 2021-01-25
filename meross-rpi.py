@@ -89,6 +89,15 @@ async def main(loop):
     bikeAmyPin = 17
     exitapp = False
     logger.info("starting while loop")
+
+    while True:
+        try:
+            await asyncio.sleep(0.1, loop=loop)
+        except asyncio.CancelledError:
+            logger.info("CancelledError received")
+            return "cancelled the test"
+            
+
     while not exitapp: 
         try:
             await asyncio.sleep(0.1, loop=loop)

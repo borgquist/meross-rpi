@@ -235,7 +235,7 @@ async def main():
     logger.info("Shutdown complete!")
 
 
-def setup_logger(logger_name, log_file, level=logging.INFO):
+def setup_logger(logger_name, log_file, level=logger.info):
     # # Erase log if already exists
     # if exists(log_file):
     #     remove(log_file)
@@ -273,10 +273,12 @@ if __name__ == '__main__':
         loop.create_task(main())
         loop.run_forever()
     except KeyboardInterrupt:
-        logging.info("Process interrupted")
+        logger.info("Process interrupted")
     finally:
+        for task in asyncio.Task.all_tasks():
+            task.cancel()
         loop.close()
-        logging.info("Successfully shutdown the meross service.")
+        logger.info("Successfully shutdown the meross service.")
     exitapp = True
     logger.info("loop closed")
 

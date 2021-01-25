@@ -205,7 +205,19 @@ async def main(loop):
             
         except asyncio.CancelledError:
             logger.info("CancelledError received")
-            exitapp = True
+            try:
+                manager.close()
+                logger.info("Manager closed")
+            except UnboundLocalError:
+                logger.info("manager doesn't exist")
+            try:
+                await http_api_client.async_logout()
+                logger.info("http_api_client.async_logout")
+            except UnboundLocalError:
+                logger.info("http_api_client doesn't exist")
+            
+            return "main cancelled in except"
+
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
             doReset = True

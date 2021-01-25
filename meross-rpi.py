@@ -274,7 +274,7 @@ if __name__ == '__main__':
 
     loop = asyncio.get_event_loop()
     asyncio.ensure_future(main(loop), loop=loop)
-    asyncio.ensure_future(checkInternet(loop), loop=loop)
+    # asyncio.ensure_future(checkInternet(loop), loop=loop)
     loop.add_signal_handler(signal.SIGTERM,
                             functools.partial(asyncio.ensure_future,
                                             shutdown(signal.SIGTERM, loop)))

@@ -26,15 +26,10 @@ def haveInternet():
     return True
 
 
-
-
 devBikeFred = "notSet"
 devBikeAmy = "notSet"
 devFanWindow = "notSet"
 devFanRoom = "notSet"
-exitapp = False
-
-    
 
 
 internetIsLost = False
@@ -43,19 +38,22 @@ async def checkInternet():
     # global doReset
     global internetIsLost
     logger.info("checking internet")
-    while(True):
-        while(not haveInternet()):
-            internetIsLost = True
-            logger.info("internet is not available, sleeping 1 second")
-            await asyncio.sleep(1)
-        
-        if internetIsLost:
-            logger.info("internet is back")
-            #doReset = True
-            internetIsLost = False
+    try:
+        while(True):
+            while(not haveInternet()):
+                internetIsLost = True
+                logger.info("internet is not available, sleeping 1 second")
+                await asyncio.sleep(1)
             
-        await asyncio.sleep(3)
-
+            if internetIsLost:
+                logger.info("internet is back")
+                #doReset = True
+                internetIsLost = False
+                
+            await asyncio.sleep(3)
+    except asyncio.CancelledError:
+        logger.info("asyncio.CancelledError, in checkInternet")
+                
     
 
 
@@ -92,7 +90,7 @@ async def main():
     fanWindowPin = 23
     bikeFredPin = 5
     bikeAmyPin = 17
-
+    exitapp = False
     logger.info("starting while loop")
     while not exitapp: 
         try:
@@ -212,11 +210,7 @@ async def main():
             
         except asyncio.CancelledError:
             logger.info("CancelledError received")
-            manager.close()
-            logger.info("Manager closed")
-            await http_api_client.async_logout()
-            logger.info("http_api_client.async_logout")
-            return
+            exitapp = True
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
             doReset = True

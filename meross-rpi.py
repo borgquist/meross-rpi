@@ -209,21 +209,29 @@ async def main(loop):
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
             doReset = True
-            if manager is not None:
+            try:
                 manager.close()
                 logger.info("Manager closed")
-            if http_api_client is not None:
+            except UnboundLocalError:
+                logger.info("manager doesn't exist")
+            try:
                 await http_api_client.async_logout()
                 logger.info("http_api_client.async_logout")
+            except UnboundLocalError:
+                logger.info("http_api_client doesn't exist")
             await asyncio.sleep(3, loop=loop)
 
     logger.info("Shutting down!")
-    if manager is not None:
+    try:
         manager.close()
         logger.info("Manager closed")
-    if http_api_client is not None:
+    except UnboundLocalError:
+        logger.info("manager doesn't exist")
+    try:
         await http_api_client.async_logout()
         logger.info("http_api_client.async_logout")
+    except UnboundLocalError:
+        logger.info("http_api_client doesn't exist")
     GPIO.cleanup()
     logger.info("Shutdown complete!")
     return "main cancelled"

@@ -210,17 +210,21 @@ async def main(loop):
         except Exception as err:
             logger.error("exception in main " + traceback.format_exc())
             doReset = True
-            manager.close()
-            logger.info("Manager closed")
-            await http_api_client.async_logout()
-            logger.info("http_api_client.async_logout")
+            if manager is not None:
+                manager.close()
+                logger.info("Manager closed")
+            if http_api_client is not None:
+                await http_api_client.async_logout()
+                logger.info("http_api_client.async_logout")
             await asyncio.sleep(3, loop=loop)
 
     logger.info("Shutting down!")
-    manager.close()
-    logger.info("Manager closed")
-    await http_api_client.async_logout()
-    logger.info("http_api_client.async_logout")
+    if manager is not None:
+        manager.close()
+        logger.info("Manager closed")
+    if http_api_client is not None:
+        await http_api_client.async_logout()
+        logger.info("http_api_client.async_logout")
     GPIO.cleanup()
     logger.info("Shutdown complete!")
     return "main cancelled"

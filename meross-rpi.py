@@ -235,7 +235,7 @@ async def main():
     logger.info("Shutdown complete!")
 
 
-def setup_logger(logger_name, log_file, level=logger.info):
+def setup_logger(logger_name, log_file, level=logging.info):
     # # Erase log if already exists
     # if exists(log_file):
     #     remove(log_file)

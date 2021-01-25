@@ -89,18 +89,9 @@ async def main(loop):
     bikeAmyPin = 17
     exitapp = False
     logger.info("starting while loop")
-
-    while True:
-        try:
-            await asyncio.sleep(0.1, loop=loop)
-        except asyncio.CancelledError:
-            logger.info("CancelledError received")
-            return "cancelled the test"
-            
-
     while not exitapp: 
         try:
-            await asyncio.sleep(0.1, loop=loop)
+            await asyncio.sleep(2, loop=loop)
             
             # first time is created and then afterwards this is a reset
             if(doReset and not internetIsLost):
@@ -240,7 +231,6 @@ async def main(loop):
                 logger.info("http_api_client.async_logout")
             except UnboundLocalError:
                 logger.info("http_api_client doesn't exist")
-            await asyncio.sleep(3, loop=loop)
 
     logger.info("Shutting down!")
     try:

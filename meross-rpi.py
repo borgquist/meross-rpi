@@ -226,13 +226,13 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
     l.addHandler(fileHandler)
     l.addHandler(streamHandler)
 
-def setup_meross_logger():
+def setup_meross_logger(log_file):
     l = logging.getLogger("meross_iot")
     l.setLevel(logging.INFO)
 
     formatter = logging.Formatter(
         '%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
-    fileHandler = logging.FileHandler('/home/pi/meross.log', mode='w')
+    fileHandler = logging.FileHandler(log_file, mode='w')
     fileHandler.setFormatter(formatter)
     streamHandler = logging.StreamHandler()
     streamHandler.setFormatter(formatter)
@@ -261,8 +261,8 @@ if __name__ == '__main__':
     PASSWORD = configToBeLoaded['password']
 
     
-    setup_logger('merosslogger', '/home/pi/meross.log')
-    setup_meross_logger()
+    setup_logger('merosslogger', '/home/pi/gymbike.log')
+    setup_meross_logger('/home/pi/meross_iot.log')
     logger = logging.getLogger('merosslogger')
 
     logger.info("Starting " + appname)

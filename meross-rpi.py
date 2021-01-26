@@ -226,6 +226,18 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
     l.addHandler(fileHandler)
     l.addHandler(streamHandler)
 
+def setup_meross_logger():
+    l = logging.getLogger("meross_iot")
+    l.setLevel(logging.INFO)
+
+    formatter = logging.Formatter(
+        '%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
+    fileHandler = logging.FileHandler('/home/pi/meross_iot.log', mode='w')
+    fileHandler.setFormatter(formatter)
+    streamHandler = logging.StreamHandler()
+    streamHandler.setFormatter(formatter)
+    l.addHandler(fileHandler)
+    l.addHandler(streamHandler)
 
 async def shutdown(sig, loop):
     logger = logging.getLogger('merosslogger')
@@ -248,10 +260,9 @@ if __name__ == '__main__':
     EMAIL = configToBeLoaded['username']
     PASSWORD = configToBeLoaded['password']
 
-    meross_root_logger = logging.getLogger("meross_iot")
-    meross_root_logger.setLevel(logging.INFO)
-
+    
     setup_logger('merosslogger', '/home/pi/meross.log')
+    setup_meross_logger()
     logger = logging.getLogger('merosslogger')
 
     logger.info("Starting " + appname)

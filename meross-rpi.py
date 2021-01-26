@@ -113,10 +113,8 @@ async def main(loop):
 
             if timestampNow - timestampOnlineCheck > 5:
                 if(str(devBikeFred.online_status) != "OnlineStatus.ONLINE"):
-                    logger.info("online status is NOT online [" + str(devBikeFred.online_status) + "]")
-                if(str(devBikeFred.online_status) == "OnlineStatus.ONLINE"):
-                    logger.info("online status is online [" + str(devBikeFred.online_status) + "]")
-                
+                    logger.info("online status is NOT online [" + str(devBikeFred.online_status) + "] setting doReset")
+                    doReset = True
                 timestampOnlineCheck = timestampNow
                 
 

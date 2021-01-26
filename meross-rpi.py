@@ -21,24 +21,23 @@ devFanRoom = "notSet"
 
 
 async def main(loop):
-    global devBikeFred 
-    global devBikeAmy 
+    global devBikeFred
+    global devBikeAmy
     global devFanWindow
-    global devFanRoom 
+    global devFanRoom
     logger = logging.getLogger('merosslogger')
-    
+
     gpioManager = GpioManager("test")
 
-    
     doReset = False
     firstRun = True
     logger.info("recreating http client")
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
     logger.info("recreating manager")
-    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
+    manager = MerossManager(http_client=http_api_client,
+                            burst_requests_per_second_limit=4, requests_per_second_limit=2)
     logger.info("doing manager.async_init")
-    
-    
+
     isFanRoomOn = False
     isFanWindowOn = False
     isBikeAmyOn = False
@@ -55,22 +54,24 @@ async def main(loop):
     bikeAmyPin = 17
     exitapp = False
     logger.info("starting while loop")
-    while not exitapp: 
+    while not exitapp:
         try:
             await asyncio.sleep(0.2, loop=loop)
-            
+
             # first time is created and then afterwards this is a reset
             if(doReset or firstRun):
                 doReset = False
                 if firstRun:
-                    logger.info("firstrun so skipping manager and http in loop")
+                    logger.info(
+                        "firstrun so skipping manager and http in loop")
                 else:
                     logger.info("recreating http client")
                     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
                     logger.info("recreating manager")
-                    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
+                    manager = MerossManager(
+                        http_client=http_api_client, burst_requests_per_second_limit=4, requests_per_second_limit=2)
                     logger.info("doing manager.async_init")
-                    
+
                 await manager.async_init()
                 logger.info("doing async update")
 
@@ -78,32 +79,33 @@ async def main(loop):
                 plugs = manager.find_devices()
 
                 for dev in plugs:
-                    logger.info(f"- {dev.name} ({dev.type}): {dev.online_status}")
+                    logger.info(
+                        f"- {dev.name} ({dev.type}): {dev.online_status}")
                     if(dev.name == "fredbike"):
                         devBikeFred = dev
                         logger.info(f"found fredbike {devBikeFred}")
-                    
+
                     if(dev.name == "amybike"):
                         devBikeAmy = dev
                         logger.info(f"found devBikeAmy {devBikeAmy}")
-                    
+
                     if(dev.name == "windowfan"):
                         devFanWindow = dev
                         logger.info(f"found devFanWindow {devFanWindow}")
-                    
+
                     if(dev.name == "roomfan"):
                         devFanRoom = dev
                         logger.info(f"found devFanRoom {devFanRoom}")
-                
+
                 await devBikeFred.async_update()
                 await devBikeAmy.async_update()
                 await devFanWindow.async_update()
                 await devFanRoom.async_update()
                 if(not firstRun):
-                    logger.info("done doing async update, sleeping 3 seconds to prevent races")
+                    logger.info(
+                        "done doing async update, sleeping 3 seconds to prevent races")
                     await asyncio.sleep(3, loop=loop)
 
-                
             firstRun = False
             timestampNow = time.time()
 
@@ -120,7 +122,6 @@ async def main(loop):
                         await devFanRoom.async_turn_on(channel=0)
                         gpioManager.setLed(buttonName, True)
                         isFanRoomOn = True
-                    
 
             buttonName = "fanWindow"
             if gpioManager.isButtonPinPushed(fanWindowPin):
@@ -135,7 +136,7 @@ async def main(loop):
                         await devFanWindow.async_turn_on(channel=0)
                         gpioManager.setLed(buttonName, True)
                         isFanWindowOn = True
-                    
+
             buttonName = "bikeFred"
             if gpioManager.isButtonPinPushed(bikeFredPin):
                 if timeBikeFredPushed < timestampNow - 0.5:
@@ -150,7 +151,6 @@ async def main(loop):
                         gpioManager.setLed(buttonName, True)
                         isBikeFredOn = True
 
-            
             buttonName = "bikeAmy"
             if gpioManager.isButtonPinPushed(bikeAmyPin):
                 if timeBikeAmyPushed < timestampNow - 0.5:
@@ -164,8 +164,7 @@ async def main(loop):
                         await devBikeAmy.async_turn_on(channel=0)
                         gpioManager.setLed(buttonName, True)
                         isBikeAmyOn = True
-            
-            
+
         except asyncio.CancelledError:
             logger.info("CancelledError received")
             try:
@@ -178,7 +177,7 @@ async def main(loop):
                 logger.info("http_api_client logged out successfully")
             except UnboundLocalError:
                 logger.info("http_api_client doesn't exist")
-            
+
             return "main cancelled in except"
 
         except Exception as err:
@@ -217,7 +216,8 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
     #     remove(log_file)
     # Configure log file
     l = logging.getLogger(logger_name)
-    formatter = logging.Formatter('%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
+    formatter = logging.Formatter(
+        '%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
     fileHandler = logging.FileHandler(log_file, mode='w')
     fileHandler.setFormatter(formatter)
     streamHandler = logging.StreamHandler()
@@ -225,6 +225,7 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
     l.setLevel(level)
     l.addHandler(fileHandler)
     l.addHandler(streamHandler)
+
 
 async def shutdown(sig, loop):
     print('caught {0}'.format(sig.name))
@@ -234,7 +235,7 @@ async def shutdown(sig, loop):
     results = await asyncio.gather(*tasks, return_exceptions=True)
     print('finished awaiting cancelled tasks, results: {0}'.format(results))
     loop.stop()
- 
+
 
 if __name__ == '__main__':
     appname = 'meross'
@@ -246,8 +247,6 @@ if __name__ == '__main__':
     PASSWORD = configToBeLoaded['password']
     setup_logger('merosslogger', '/home/pi/meross.log')
     logger = logging.getLogger('merosslogger')
-    
-
 
     logger.info("Starting " + appname)
     logger.info("in async def main")
@@ -256,15 +255,13 @@ if __name__ == '__main__':
     asyncio.ensure_future(main(loop), loop=loop)
     loop.add_signal_handler(signal.SIGTERM,
                             functools.partial(asyncio.ensure_future,
-                                            shutdown(signal.SIGTERM, loop)))
+                                              shutdown(signal.SIGTERM, loop)))
     loop.add_signal_handler(signal.SIGINT,
                             functools.partial(asyncio.ensure_future,
-                                            shutdown(signal.SIGTERM, loop)))
+                                              shutdown(signal.SIGTERM, loop)))
 
     try:
         loop.run_forever()
     finally:
         loop.close()
         logger.info("loop closed")
-    
-

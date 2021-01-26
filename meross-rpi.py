@@ -247,6 +247,10 @@ if __name__ == '__main__':
         configToBeLoaded = json.load(f)
     EMAIL = configToBeLoaded['username']
     PASSWORD = configToBeLoaded['password']
+
+    meross_root_logger = logging.getLogger("meross_iot")
+    meross_root_logger.setLevel(logging.INFO)
+
     setup_logger('merosslogger', '/home/pi/meross.log')
     logger = logging.getLogger('merosslogger')
 

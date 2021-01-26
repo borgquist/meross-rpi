@@ -14,48 +14,10 @@ import signal
 import functools
 
 
-def haveInternet():
-    googleHostForInternetCheck = "8.8.8.8"
-    try:
-        output = subprocess.check_output(
-            "ping -c 5 {}".format(googleHostForInternetCheck), shell=True)
-
-    except Exception:
-        return False
-
-    return True
-
-
 devBikeFred = "notSet"
 devBikeAmy = "notSet"
 devFanWindow = "notSet"
 devFanRoom = "notSet"
-
-
-internetIsLost = False
-async def checkInternet(loop):
-    logger = logging.getLogger('merosslogger')
-    # global doReset
-    global internetIsLost
-    logger.info("checking internet")
-    try:
-        while(True):
-            while(not haveInternet()):
-                internetIsLost = True
-                logger.info("internet is not available, sleeping 1 second")
-                await asyncio.sleep(1, loop=loop)
-            
-            if internetIsLost:
-                logger.info("internet is back")
-                #doReset = True
-                internetIsLost = False
-                
-            await asyncio.sleep(3, loop=loop)
-    except asyncio.CancelledError:
-        logger.info("asyncio.CancelledError, in checkInternet")
-        return "checkInternet cancelled"
-                
-    
 
 
 async def main(loop):
@@ -63,13 +25,12 @@ async def main(loop):
     global devBikeAmy 
     global devFanWindow
     global devFanRoom 
-    global internetIsLost
     logger = logging.getLogger('merosslogger')
     
     gpioManager = GpioManager("test")
 
     
-    doReset = True
+    doReset = False
     firstRun = True
     logger.info("recreating http client")
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
@@ -99,7 +60,7 @@ async def main(loop):
             await asyncio.sleep(0.2, loop=loop)
             
             # first time is created and then afterwards this is a reset
-            if(doReset and not internetIsLost):
+            if(doReset or firstRun):
                 doReset = False
                 if firstRun:
                     logger.info("firstrun so skipping manager and http in loop")
@@ -143,14 +104,12 @@ async def main(loop):
                     await asyncio.sleep(3, loop=loop)
 
                 
-            
+            firstRun = False
             timestampNow = time.time()
 
             buttonName = "fanRoom"
             if gpioManager.isButtonPinPushed(fanRoomPin):
-                if(internetIsLost):
-                    logger.info("not processing " + buttonName + " button press since internet is lost")
-                elif timeFanRoomPushed < timestampNow - 0.5:
+                if timeFanRoomPushed < timestampNow - 0.5:
                     logger.info(buttonName + " button was pushed!")
                     timeFanRoomPushed = timestampNow
                     if(isFanRoomOn):
@@ -165,9 +124,7 @@ async def main(loop):
 
             buttonName = "fanWindow"
             if gpioManager.isButtonPinPushed(fanWindowPin):
-                if(internetIsLost):
-                    logger.info("not processing " + buttonName + " button press since internet is lost")
-                elif timeFanWindowPushed < timestampNow - 0.5:
+                if timeFanWindowPushed < timestampNow - 0.5:
                     logger.info(buttonName + " button was pushed!")
                     timeFanWindowPushed = timestampNow
                     if(isFanWindowOn):
@@ -181,9 +138,7 @@ async def main(loop):
                     
             buttonName = "bikeFred"
             if gpioManager.isButtonPinPushed(bikeFredPin):
-                if(internetIsLost):
-                    logger.info("not processing " + buttonName + " button press since internet is lost")
-                elif timeBikeFredPushed < timestampNow - 0.5:
+                if timeBikeFredPushed < timestampNow - 0.5:
                     logger.info(buttonName + " button was pushed!")
                     timeBikeFredPushed = timestampNow
                     if(isBikeFredOn):
@@ -198,9 +153,7 @@ async def main(loop):
             
             buttonName = "bikeAmy"
             if gpioManager.isButtonPinPushed(bikeAmyPin):
-                if(internetIsLost):
-                    logger.info("not processing " + buttonName + " button press since internet is lost")
-                elif timeBikeAmyPushed < timestampNow - 0.5:
+                if timeBikeAmyPushed < timestampNow - 0.5:
                     logger.info(buttonName + " button was pushed!")
                     timeBikeAmyPushed = timestampNow
                     if(isBikeAmyOn):
@@ -211,18 +164,18 @@ async def main(loop):
                         await devBikeAmy.async_turn_on(channel=0)
                         gpioManager.setLed(buttonName, True)
                         isBikeAmyOn = True
-            firstRun = False
+            
             
         except asyncio.CancelledError:
             logger.info("CancelledError received")
             try:
                 manager.close()
-                logger.info("Manager closed")
+                logger.info("Manager closed successfully")
             except UnboundLocalError:
                 logger.info("manager doesn't exist")
             try:
                 await http_api_client.async_logout()
-                logger.info("http_api_client.async_logout")
+                logger.info("http_api_client logged out successfully")
             except UnboundLocalError:
                 logger.info("http_api_client doesn't exist")
             
@@ -233,24 +186,24 @@ async def main(loop):
             doReset = True
             try:
                 manager.close()
-                logger.info("Manager closed")
+                logger.info("Manager closed successfully")
             except UnboundLocalError:
                 logger.info("manager doesn't exist")
             try:
                 await http_api_client.async_logout()
-                logger.info("http_api_client.async_logout")
+                logger.info("http_api_client logged out successfully")
             except UnboundLocalError:
                 logger.info("http_api_client doesn't exist")
 
     logger.info("Shutting down!")
     try:
         manager.close()
-        logger.info("Manager closed")
+        logger.info("Manager closed successfully")
     except UnboundLocalError:
         logger.info("manager doesn't exist")
     try:
         await http_api_client.async_logout()
-        logger.info("http_api_client.async_logout")
+        logger.info("http_api_client logged out successfully")
     except UnboundLocalError:
         logger.info("http_api_client doesn't exist")
     GPIO.cleanup()
@@ -301,7 +254,6 @@ if __name__ == '__main__':
 
     loop = asyncio.get_event_loop()
     asyncio.ensure_future(main(loop), loop=loop)
-    # asyncio.ensure_future(checkInternet(loop), loop=loop)
     loop.add_signal_handler(signal.SIGTERM,
                             functools.partial(asyncio.ensure_future,
                                             shutdown(signal.SIGTERM, loop)))

@@ -232,7 +232,7 @@ def setup_meross_logger():
 
     formatter = logging.Formatter(
         '%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
-    fileHandler = logging.FileHandler('/home/pi/meross_iot.log', mode='w')
+    fileHandler = logging.FileHandler('/home/pi/meross.log', mode='w')
     fileHandler.setFormatter(formatter)
     streamHandler = logging.StreamHandler()
     streamHandler.setFormatter(formatter)

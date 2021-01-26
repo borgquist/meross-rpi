@@ -71,7 +71,12 @@ async def main(loop):
     
     doReset = True
     firstRun = True
-
+    logger.info("recreating http client")
+    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
+    logger.info("recreating manager")
+    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
+    logger.info("doing manager.async_init")
+    
     
     isFanRoomOn = False
     isFanWindowOn = False
@@ -91,17 +96,20 @@ async def main(loop):
     logger.info("starting while loop")
     while not exitapp: 
         try:
-            await asyncio.sleep(2, loop=loop)
+            await asyncio.sleep(0.2, loop=loop)
             
             # first time is created and then afterwards this is a reset
             if(doReset and not internetIsLost):
                 doReset = False
-
-                logger.info("recreating http client")
-                http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
-                logger.info("recreating manager")
-                manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
-                logger.info("doing manager.async_init")
+                if firstRun:
+                    logger.info("firstrun so skipping manager and http in loop")
+                else:
+                    logger.info("recreating http client")
+                    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
+                    logger.info("recreating manager")
+                    manager = MerossManager(http_client=http_api_client, burst_requests_per_second_limit = 4, requests_per_second_limit = 2)
+                    logger.info("doing manager.async_init")
+                    
                 await manager.async_init()
                 logger.info("doing async update")
 
@@ -130,8 +138,9 @@ async def main(loop):
                 await devBikeAmy.async_update()
                 await devFanWindow.async_update()
                 await devFanRoom.async_update()
-                logger.info("done doing async update, sleeping 3 seconds to prevent races")
-                await asyncio.sleep(3, loop=loop)
+                if(not firstRun):
+                    logger.info("done doing async update, sleeping 3 seconds to prevent races")
+                    await asyncio.sleep(3, loop=loop)
 
                 
             
@@ -202,6 +211,7 @@ async def main(loop):
                         await devBikeAmy.async_turn_on(channel=0)
                         gpioManager.setLed(buttonName, True)
                         isBikeAmyOn = True
+            firstRun = False
             
         except asyncio.CancelledError:
             logger.info("CancelledError received")
@@ -291,7 +301,7 @@ if __name__ == '__main__':
 
     loop = asyncio.get_event_loop()
     asyncio.ensure_future(main(loop), loop=loop)
-    asyncio.ensure_future(checkInternet(loop), loop=loop)
+    # asyncio.ensure_future(checkInternet(loop), loop=loop)
     loop.add_signal_handler(signal.SIGTERM,
                             functools.partial(asyncio.ensure_future,
                                             shutdown(signal.SIGTERM, loop)))

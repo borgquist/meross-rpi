@@ -112,9 +112,12 @@ async def main(loop):
             timestampNow = time.time()
 
             if timestampNow - timestampOnlineCheck > 5:
-                logger.info("checking online status")
-                logger.info("online status is " + str(devBikeFred.online_status))
-                logger.info("online status check done")
+                if(str(devBikeFred.online_status) != "OnlineStatus.ONLINE"):
+                    logger.info("online status is NOT online [" + str(devBikeFred.online_status) + "]")
+                if(str(devBikeFred.online_status) == "OnlineStatus.ONLINE"):
+                    logger.info("online status is online [" + str(devBikeFred.online_status) + "]")
+                
+                timestampOnlineCheck = timestampNow
                 
 
             buttonName = "fanRoom"

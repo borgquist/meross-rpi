@@ -54,6 +54,8 @@ async def main(loop):
     bikeAmyPin = 17
     exitapp = False
     logger.info("starting while loop")
+
+    timestampOnlineCheck = 0
     while not exitapp:
         try:
             await asyncio.sleep(0.2, loop=loop)
@@ -108,6 +110,12 @@ async def main(loop):
 
             firstRun = False
             timestampNow = time.time()
+
+            if timestampNow - timestampOnlineCheck > 5:
+                logger.info("checking online status")
+                logger.info("online status is " + str(devBikeFred.online_status))
+                logger.info("online status check done")
+                
 
             buttonName = "fanRoom"
             if gpioManager.isButtonPinPushed(fanRoomPin):

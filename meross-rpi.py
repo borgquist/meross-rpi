@@ -12,7 +12,7 @@ from os.path import exists
 import traceback
 import signal
 import functools
-
+from meross_iot.model.exception import UnconnectedError
 
 devBikeFred = "notSet"
 devBikeAmy = "notSet"
@@ -98,11 +98,15 @@ async def main(loop):
                     if(dev.name == "roomfan"):
                         devFanRoom = dev
                         logger.info(f"found devFanRoom {devFanRoom}")
-
-                await devBikeFred.async_update()
-                await devBikeAmy.async_update()
-                await devFanWindow.async_update()
-                await devFanRoom.async_update()
+                try:
+                    await devBikeFred.async_update()
+                    await devBikeAmy.async_update()
+                    await devFanWindow.async_update()
+                    await devFanRoom.async_update()
+                except UnconnectedError:
+                    logger.info("UnconnectedError in dev async update, setting doReset to true")
+                    doReset = True
+                    
                 if(not firstRun):
                     logger.info(
                         "done doing async update, sleeping 3 seconds to prevent races")
@@ -206,6 +210,8 @@ async def main(loop):
                 logger.info("http_api_client logged out successfully")
             except UnboundLocalError:
                 logger.info("http_api_client doesn't exist")
+            asyncio.sleep(2)
+                    
 
     logger.info("Shutting down!")
     try:

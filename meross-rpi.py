@@ -18,9 +18,46 @@ devBikeFred = "notSet"
 devBikeAmy = "notSet"
 devFanWindow = "notSet"
 devFanRoom = "notSet"
+buttonPressedFred = 0
+buttonPressedAmy = 0
+buttonPressedWindow = 0
+buttonPressedRoom = 0
 
 def current_milli_time():
     return round(time.time() * 1000)
+
+async def buttons(loop):
+    global buttonPressedFred
+    global buttonPressedAmy
+    global buttonPressedWindow
+    global buttonPressedRoom
+    fanRoomPin = 27
+    fanWindowPin = 23
+    bikeFredPin = 5
+    bikeAmyPin = 17
+    logger = logging.getLogger('merosslogger')
+
+    while True:
+        try:
+            if GPIO.input(bikeFredPin) == GPIO.HIGH:
+                buttonPressedFred = current_milli_time()
+            if GPIO.input(bikeAmyPin) == GPIO.HIGH:
+                buttonPressedAmy = current_milli_time()
+            if GPIO.input(fanWindowPin) == GPIO.HIGH:
+                buttonPressedWindow = current_milli_time()
+            if GPIO.input(fanRoomPin) == GPIO.HIGH:
+                buttonPressedRoom = current_milli_time()
+            await asyncio.sleep(0.1, loop=loop)
+
+        except asyncio.CancelledError:
+            logger.info("Shutdown of buttons task is requested")
+            return "buttons cancelled"
+
+        except Exception as err:
+            logger.error("exception in buttons " + traceback.format_exc())
+            asyncio.sleep(2)
+                    
+
 
 async def main(loop):
     global devBikeFred
@@ -75,9 +112,9 @@ async def main(loop):
             timestampNowMs = newTimeNowMs
             lastTimeStampMs = timestampNowMs
 
-            if timestampNowMs - lastTimeLogMs > 10:
+            if timestampNowMs - lastTimeLogMs > 10000:
                 logger.info("timeWaiting [" + str(timeWaitingMs / 1000) + "] + timeWorking [" + str(timeWorkingMs / 1000) + "] ratio [" + str(timeWorkingMs / timeWaitingMs) + "]")
-                lastTimeLog = timestampNowMs
+                lastTimeLogMs = timestampNowMs
 
             # first time is created and then afterwards this is a reset
             if(doReset or firstRun):

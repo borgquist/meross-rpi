@@ -105,12 +105,14 @@ async def main(loop):
             
             
             timestampNowMs = current_milli_time()
-            timeWorkingMs += timestampNowMs - lastTimeStampMs
-            await asyncio.sleep(0.2, loop=loop)
+            if(not firstRun):
+                timeWorkingMs += timestampNowMs - lastTimeStampMs
+            await asyncio.sleep(0.1, loop=loop)
             newTimeNowMs = current_milli_time()
-            timeWaitingMs += newTimeNowMs - timestampNowMs
+            if(not firstRun):
+                timeWaitingMs += newTimeNowMs - timestampNowMs
+                lastTimeStampMs = timestampNowMs
             timestampNowMs = newTimeNowMs
-            lastTimeStampMs = timestampNowMs
 
             if timestampNowMs - lastTimeLogMs > 10000:
                 logger.info("timeWaiting [" + str(timeWaitingMs / 1000) + "] + timeWorking [" + str(timeWorkingMs / 1000) + "] ratio [" + str(timeWorkingMs / timeWaitingMs) + "]")

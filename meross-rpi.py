@@ -183,7 +183,7 @@ async def main(loop):
                 
 
             buttonName = "fanRoom"
-            if(timeButtonPressedRoom < timestampNow - 0.5):
+            if(timeButtonPressedRoom > timestampNow - 0.5):
                 if(isFanRoomOn):
                     logger.info("Button pushed. Turning OFF " + buttonName)
                     await devFanRoom.async_turn_off(channel=0)
@@ -196,7 +196,7 @@ async def main(loop):
                     isFanRoomOn = True
 
             buttonName = "fanWindow"
-            if(timeButtonPressedWindow < timestampNow - 0.5):
+            if(timeButtonPressedWindow > timestampNow - 0.5):
                 if(isFanWindowOn):
                     logger.info("Button pushed. Turning OFF " + buttonName)
                     await devFanWindow.async_turn_off(channel=0)
@@ -209,7 +209,7 @@ async def main(loop):
                     isFanWindowOn = True
 
             buttonName = "bikeFred"
-            if(timeButtonPressedFred < timestampNow - 0.5):
+            if(timeButtonPressedFred > timestampNow - 0.5):
                 if(isBikeFredOn):
                     logger.info("Button pushed. Turning OFF " + buttonName)
                     await devBikeFred.async_turn_off(channel=0)
@@ -222,7 +222,7 @@ async def main(loop):
                     isBikeFredOn = True
 
             buttonName = "bikeAmy"
-            if(timeButtonPressedAmy < timestampNow - 0.5):
+            if(timeButtonPressedAmy > timestampNow - 0.5):
                 if(isBikeAmyOn):
                     logger.info("Button pushed. Turning OFF " + buttonName)
                     await devBikeAmy.async_turn_off(channel=0)
@@ -341,7 +341,7 @@ if __name__ == '__main__':
 
     loop = asyncio.get_event_loop()
     asyncio.ensure_future(main(loop), loop=loop)
-    asyncio.ensure_future(buttons(loop), loop=loop)
+    # asyncio.ensure_future(buttons(loop), loop=loop)
     loop.add_signal_handler(signal.SIGTERM,
                             functools.partial(asyncio.ensure_future,
                                               shutdown(signal.SIGTERM, loop)))

@@ -186,12 +186,12 @@ async def main(loop):
             if(timeButtonPressedRoom > timestampNow - 0.5):
                 if(isFanRoomOn):
                     logger.info("Button pushed. Turning OFF " + buttonName)
-                    await devFanRoom.async_turn_off(channel=0)
+                    # await devFanRoom.async_turn_off(channel=0)
                     gpioManager.setLed(buttonName, False)
                     isFanRoomOn = False
                 else:
                     logger.info("Button pushed. Turning ON " + buttonName)
-                    await devFanRoom.async_turn_on(channel=0)
+                    # await devFanRoom.async_turn_on(channel=0)
                     gpioManager.setLed(buttonName, True)
                     isFanRoomOn = True
 
@@ -199,12 +199,12 @@ async def main(loop):
             if(timeButtonPressedWindow > timestampNow - 0.5):
                 if(isFanWindowOn):
                     logger.info("Button pushed. Turning OFF " + buttonName)
-                    await devFanWindow.async_turn_off(channel=0)
+                    # await devFanWindow.async_turn_off(channel=0)
                     gpioManager.setLed(buttonName, False)
                     isFanWindowOn = False
                 else:
                     logger.info("Button pushed. Turning ON " + buttonName)
-                    await devFanWindow.async_turn_on(channel=0)
+                    # await devFanWindow.async_turn_on(channel=0)
                     gpioManager.setLed(buttonName, True)
                     isFanWindowOn = True
 
@@ -212,12 +212,12 @@ async def main(loop):
             if(timeButtonPressedFred > timestampNow - 0.5):
                 if(isBikeFredOn):
                     logger.info("Button pushed. Turning OFF " + buttonName)
-                    await devBikeFred.async_turn_off(channel=0)
+                    # await devBikeFred.async_turn_off(channel=0)
                     gpioManager.setLed(buttonName, False)
                     isBikeFredOn = False
                 else:
                     logger.info("Button pushed. Turning ON " + buttonName)
-                    await devBikeFred.async_turn_on(channel=0)
+                    # await devBikeFred.async_turn_on(channel=0)
                     gpioManager.setLed(buttonName, True)
                     isBikeFredOn = True
 
@@ -225,12 +225,12 @@ async def main(loop):
             if(timeButtonPressedAmy > timestampNow - 0.5):
                 if(isBikeAmyOn):
                     logger.info("Button pushed. Turning OFF " + buttonName)
-                    await devBikeAmy.async_turn_off(channel=0)
+                    # await devBikeAmy.async_turn_off(channel=0)
                     gpioManager.setLed(buttonName, False)
                     isBikeAmyOn = False
                 else:
                     logger.info("Button pushed. Turning ON " + buttonName)
-                    await devBikeAmy.async_turn_on(channel=0)
+                    # await devBikeAmy.async_turn_on(channel=0)
                     gpioManager.setLed(buttonName, True)
                     isBikeAmyOn = True
 
@@ -341,7 +341,7 @@ if __name__ == '__main__':
 
     loop = asyncio.get_event_loop()
     asyncio.ensure_future(main(loop), loop=loop)
-    # asyncio.ensure_future(buttons(loop), loop=loop)
+    asyncio.ensure_future(buttons(loop), loop=loop)
     loop.add_signal_handler(signal.SIGTERM,
                             functools.partial(asyncio.ensure_future,
                                               shutdown(signal.SIGTERM, loop)))

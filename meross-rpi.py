@@ -68,7 +68,7 @@ async def main(loop):
             
             
             timestampNowMs = current_milli_time()
-            timeWorkingMs += timestampNowMs - lastTimeStamp Ms
+            timeWorkingMs += timestampNowMs - lastTimeStampMs
             await asyncio.sleep(0.2, loop=loop)
             newTimeNowMs = current_milli_time()
             timeWaitingMs += newTimeNowMs - timestampNowMs

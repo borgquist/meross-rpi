@@ -36,6 +36,11 @@ async def buttons(loop):
     bikeFredPin = 5
     bikeAmyPin = 17
     logger = logging.getLogger('merosslogger')
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(fanRoomPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
+    GPIO.setup(fanWindowPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
+    GPIO.setup(bikeFredPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
+    GPIO.setup(bikeAmyPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
 
     while True:
         try:
@@ -88,15 +93,6 @@ async def main(loop):
     isBikeAmyOn = False
     isBikeFredOn = False
 
-    # timeFanRoomPushed = 0
-    # timeFanWindowPushed = 0
-    # timeBikeFredPushed = 0
-    # timeBikeAmyPushed = 0
-
-    fanRoomPin = 27
-    fanWindowPin = 23
-    bikeFredPin = 5
-    bikeAmyPin = 17
     exitapp = False
     logger.info("starting while loop")
 

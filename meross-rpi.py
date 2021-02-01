@@ -19,6 +19,8 @@ devBikeAmy = "notSet"
 devFanWindow = "notSet"
 devFanRoom = "notSet"
 
+def current_milli_time():
+    return round(time.time() * 1000)
 
 async def main(loop):
     global devBikeFred
@@ -56,9 +58,26 @@ async def main(loop):
     logger.info("starting while loop")
 
     timestampOnlineCheck = 0
+
+    timeWaitingMs = 0
+    timeWorkingMs = 0
+    lastTimeStampMs = current_milli_time()
+    lastTimeLogMs = current_milli_time()
     while not exitapp:
         try:
+            
+            
+            timestampNowMs = current_milli_time()
+            timeWorkingMs += timestampNowMs - lastTimeStamp Ms
             await asyncio.sleep(0.2, loop=loop)
+            newTimeNowMs = current_milli_time()
+            timeWaitingMs += newTimeNowMs - timestampNowMs
+            timestampNowMs = newTimeNowMs
+            lastTimeStampMs = timestampNowMs
+
+            if timestampNowMs - lastTimeLogMs > 10:
+                logger.info("timeWaiting [" + str(timeWaitingMs / 1000) + "] + timeWorking [" + str(timeWorkingMs / 1000) + "] ratio [" + str(timeWorkingMs / timeWaitingMs) + "]")
+                lastTimeLog = timestampNowMs
 
             # first time is created and then afterwards this is a reset
             if(doReset or firstRun):
@@ -113,8 +132,8 @@ async def main(loop):
                     await asyncio.sleep(3, loop=loop)
 
             firstRun = False
+            
             timestampNow = time.time()
-
             if timestampNow - timestampOnlineCheck > 5:
                 if(str(devBikeFred.online_status) != "OnlineStatus.ONLINE"):
                     logger.info("online status is NOT online [" + str(devBikeFred.online_status) + "] setting doReset")

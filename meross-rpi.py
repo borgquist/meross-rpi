@@ -203,12 +203,12 @@ async def main(loop):
             try:
                 manager.close()
                 logger.info("Manager closed successfully")
-            except UnboundLocalError:
+            except:
                 logger.info("manager doesn't exist")
             try:
                 await http_api_client.async_logout()
                 logger.info("http_api_client logged out successfully")
-            except UnboundLocalError:
+            except:
                 logger.info("http_api_client doesn't exist")
             asyncio.sleep(2)
                     

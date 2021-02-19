@@ -76,7 +76,7 @@ async def main(loop):
                             logger.info("retrieved MerossHttpClient")
                         except:
                             logger.error("exception when trying to get the MerossHttpClient, trying again in 10 seconds")
-                            asyncio.sleep(10)
+                            await asyncio.sleep(10, loop=loop)
                     
 
                     logger.info("recreating manager")
@@ -220,7 +220,7 @@ async def main(loop):
                 logger.info("http_api_client logged out successfully")
             except:
                 logger.info("http_api_client doesn't exist")
-            asyncio.sleep(2)
+            await asyncio.sleep(3, loop=loop)
                     
 
     logger.info("Shutting down!")

@@ -68,7 +68,17 @@ async def main(loop):
                         "firstrun so skipping manager and http in loop")
                 else:
                     logger.info("recreating http client")
-                    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
+                    httpClientRetrieved = False
+                    while not httpClientRetrieved:
+                        try:
+                            http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
+                            httpClientRetrieved = True
+                            logger.info("retrieved MerossHttpClient")
+                        except:
+                            logger.error("exception when trying to get the MerossHttpClient, trying again in 10 seconds")
+                            asyncio.sleep(10)
+                    
+
                     logger.info("recreating manager")
                     manager = MerossManager(
                         http_client=http_api_client, burst_requests_per_second_limit=4, requests_per_second_limit=2)
